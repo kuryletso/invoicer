@@ -9,7 +9,10 @@ class BankAccountLocalization(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
-    bank_account_id: Mapped[int] = mapped_column(ForeignKey("bank_accounts.id"))
+    bank_account_id: Mapped[int] = mapped_column(
+        ForeignKey("bank_accounts.id"),
+        nullable=False
+    )
 
     language: Mapped[Language] = mapped_column(
         SQLEnum(Language, name="language_enum")

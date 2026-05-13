@@ -9,7 +9,10 @@ class RepresentativeLocalization(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
-    representative_id: Mapped[int] = mapped_column(ForeignKey("representatives.id"))
+    representative_id: Mapped[int] = mapped_column(
+        ForeignKey("representatives.id"),
+        nullable=False
+    )
 
     language: Mapped[Language] = mapped_column(
         SQLEnum(Language, name="language_enum")

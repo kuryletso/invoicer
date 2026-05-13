@@ -11,7 +11,10 @@ class OrganizationLocalization(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
-    organization_id: Mapped[int] = mapped_column(ForeignKey("organization.id"))
+    organization_id: Mapped[int] = mapped_column(
+        ForeignKey("organizations.id"),
+        nullable=False
+    )
 
     language: Mapped[Language] = mapped_column(
         SQLEnum(Language, name="language_enum")

@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from app.db.models.organization import Organization
 
-from sqlalchemy import Enum as SQLEnum, String
+from sqlalchemy import Enum as SQLEnum, String, ForeignKey, Index
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.orm.collections import attribute_mapped_collection
 
@@ -15,8 +15,19 @@ from app.domain.enums import Country, Currency, Language
 
 class BankAccount(Base):
     __tablename__ = "bank_accounts"
+    __table_args__ = (
+        Index(
+            "idx_organization_id",
+            "organization_id"
+        ),
+    )
 
     id: Mapped[int] = mapped_column(primary_key=True)
+
+    organization_id: Mapped[int] = mapped_column(
+        ForeignKey("organizations.id"),
+        nullable=False
+    )
 
     organization: Mapped[Organization] = relationship(
         back_populates="bank_accounts"
@@ -37,7 +48,7 @@ class BankAccount(Base):
         SQLEnum(Currency, name="currency_enum")
     )
 
-    bank_account_localization: Mapped[dict[Language, BankAccountLocalization]] = relationship(
+    bank_account_localizations: Mapped[dict[Language, BankAccountLocalization]] = relationship(
         BankAccountLocalization,
         collection_class=attribute_mapped_collection("language"),
         cascade="all, delete-orphan"

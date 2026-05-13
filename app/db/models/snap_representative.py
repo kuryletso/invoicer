@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Optional
 if TYPE_CHECKING:
     from app.db.models.party import Party
 
-from sqlalchemy import String
+from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -20,6 +20,11 @@ class SnapRepresentative(Base):
     title: Mapped[Optional[str]] = mapped_column(
         String(120),
         nullable=True
+    )
+
+    party_id: Mapped[int] = mapped_column(
+        ForeignKey("parties.id"),
+        nullable=False
     )
 
     party: Mapped[Party] = relationship(

@@ -37,9 +37,13 @@ class Party(Base):
     tax_id: Mapped[str] = mapped_column(String(100))
 
     snap_representative: Mapped[SnapRepresentative] = relationship(
-        back_populates="party"
+        back_populates="party",
+        uselist=False,
+        cascade="all, delete-orphan"
     )
 
     snap_bank_account: Mapped[SnapBankAccount] = relationship(
-        back_populates="party"
+        back_populates="party",
+        uselist=False,
+        cascade="all, delete-orphan"
     )

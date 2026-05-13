@@ -31,7 +31,7 @@ class Organization(Base):
         nullable=True
     )
 
-    organization_localization: Mapped[dict[Language,OrganizationLocalization]] = relationship(
+    organization_localizations: Mapped[dict[Language,OrganizationLocalization]] = relationship(
         OrganizationLocalization,
         collection_class=attribute_mapped_collection("language"),
         cascade="all, delete-orphan"

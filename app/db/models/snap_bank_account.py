@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Optional
 if TYPE_CHECKING:
     from app.db.models.party import Party
 
-from sqlalchemy import String, Enum as SQLEnum
+from sqlalchemy import String, Enum as SQLEnum, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -24,8 +24,7 @@ class SnapBankAccount(Base):
     )
 
     iban: Mapped[str] = mapped_column(
-        String(34),
-        unique=True
+        String(34)
     )
 
     swift: Mapped[Optional[str]] = mapped_column(
@@ -35,6 +34,11 @@ class SnapBankAccount(Base):
 
     currency: Mapped[Currency] = mapped_column(
         SQLEnum(Currency, name="currency_enum")
+    )
+
+    party_id: Mapped[int] = mapped_column(
+        ForeignKey("parties.id"),
+        nullable=False
     )
 
     party: Mapped[Party] = relationship(

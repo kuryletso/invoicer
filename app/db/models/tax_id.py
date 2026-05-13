@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from app.db.models.organization import Organization
 
-from sqlalchemy import Enum as SQLEnum, ForeignKey, UniqueConstraint, String
+from sqlalchemy import Enum as SQLEnum, ForeignKey, UniqueConstraint, String, Index
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -22,6 +22,12 @@ class TaxId(Base):
             "country",
             name="unique_organization_tax_id_system"
         ),
+        Index(
+            "idx_country_system_value",
+            "country",
+            "system",
+            "value"
+        )
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
