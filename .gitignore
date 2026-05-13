@@ -1,0 +1,73 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# UV
+.python-version
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Type checkers / linters
+.mypy_cache/
+.ruff_cache/
+.pyre/
+.pytype/
+
+# IDEs / editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment variables / secrets
+.env
+.env.*
+!.env.example
+
+# SQLite / local DBs
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+
+# Alembic
+alembic/versions/__pycache__/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Generated files
+*.pdf
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Node (if frontend tooling appears later)
+node_modules/
+
+# Local config overrides
+local_settings.py
