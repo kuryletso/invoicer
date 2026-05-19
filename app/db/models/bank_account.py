@@ -48,7 +48,7 @@ class BankAccount(Base):
         SQLEnum(Currency, name="currency_enum")
     )
 
-    bank_account_localizations: Mapped[dict[Language, BankAccountLocalization]] = relationship(
+    localizations: Mapped[dict[Language, BankAccountLocalization]] = relationship(
         BankAccountLocalization,
         collection_class=attribute_mapped_collection("language"),
         cascade="all, delete-orphan"

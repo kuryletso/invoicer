@@ -23,7 +23,7 @@ class Representative(Base):
         back_populates="representatives"
     )
 
-    representative_localizations: Mapped[dict[Language, RepresentativeLocalization]] = relationship(
+    localizations: Mapped[dict[Language, RepresentativeLocalization]] = relationship(
         collection_class=attribute_mapped_collection("language"),
         cascade="all, delete-orphan"
     )

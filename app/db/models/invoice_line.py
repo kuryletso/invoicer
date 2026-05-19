@@ -11,7 +11,7 @@ from sqlalchemy import String, Enum as SQLEnum, Numeric, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
-from app.domain.enums import MeasurenentUnit
+from app.domain.enums import MeasurementUnit
 
 class InvoiceLine(Base):
     __tablename__ = "invoice_lines"
@@ -31,8 +31,8 @@ class InvoiceLine(Base):
 
     quantity: Mapped[Decimal] = mapped_column(Numeric(12,3))
 
-    unit: Mapped[MeasurenentUnit] = mapped_column(
-        SQLEnum(MeasurenentUnit, name="unit_enum")
+    unit: Mapped[MeasurementUnit] = mapped_column(
+        SQLEnum(MeasurementUnit, name="unit_enum")
     )
 
     unit_price: Mapped[Decimal] = mapped_column(Numeric(12,2))

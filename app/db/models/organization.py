@@ -3,16 +3,17 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
-    from app.db.models.organization_localization import OrganizationLocalization
     from app.db.models.representative import Representative
     from app.db.models.bank_account import BankAccount
     from app.db.models.tax_id import TaxId
+    from app.db.models.document_sequence import DocumentSequence
 
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.orm.collections import attribute_mapped_collection
 
 from app.db.base import Base
+from app.db.models.organization_localization import OrganizationLocalization
 from app.domain.enums import Language
 from app.db.associations import organization_representative_m2m
 
@@ -31,7 +32,7 @@ class Organization(Base):
         nullable=True
     )
 
-    organization_localizations: Mapped[dict[Language,OrganizationLocalization]] = relationship(
+    localizations: Mapped[dict[Language,OrganizationLocalization]] = relationship(
         OrganizationLocalization,
         collection_class=attribute_mapped_collection("language"),
         cascade="all, delete-orphan"
@@ -47,6 +48,12 @@ class Organization(Base):
     )
 
     tax_ids: Mapped[list[TaxId]] = relationship(
+        back_populates="organization",
+        cascade="all, delete-orphan"
+    )
+
+    sequences: Mapped[list[DocumentSequence]] = relationship(
+        DocumentSequence,
         back_populates="organization",
         cascade="all, delete-orphan"
     )

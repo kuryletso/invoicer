@@ -10,9 +10,8 @@ class Language(StrEnum):
     UKR = "uk"
 
 
-class MeasurenentUnit(StrEnum):
+class MeasurementUnit(StrEnum):
     ...
-
 
 class Country(StrEnum):
     UKR = "ukr"
@@ -23,3 +22,9 @@ class TaxIdSystem(StrEnum):
     EIN = "ein"
     EDRPOU = "edrpou"
     SSN = "ssn"
+
+class DocumentType(StrEnum):
+    INVOICE = "invoice"
+    ACT = "act"
+    QUOTE = "quote"
+    CONTRACT = "contract"
