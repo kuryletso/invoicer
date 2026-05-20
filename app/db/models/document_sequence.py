@@ -34,7 +34,7 @@ class DocumentSequence(Base):
         nullable=False
     )
 
-    organinization: Mapped[Organization] = relationship(
+    organization: Mapped[Organization] = relationship(
         back_populates="sequences",
     )
 

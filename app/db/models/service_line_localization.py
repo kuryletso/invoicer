@@ -1,4 +1,4 @@
-from sqlalchemy import String, ForeignKey, Enum as SQLEnum
+from sqlalchemy import String, ForeignKey, Enum as SQLEnum, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
@@ -6,6 +6,13 @@ from app.domain.enums import Language
 
 class ServiceLineLocalization(Base):
     __tablename__ = "service_line_localizations"
+    __table_args__ = (
+        UniqueConstraint(
+            "service_line",
+            "language",
+            name="unique_service_line_language"
+        ),
+    )
 
     id: Mapped[int] = mapped_column(primary_key=True)
 

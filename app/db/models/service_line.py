@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from sqlalchemy import Numeric, Enum as SQLEnum, UniqueConstraint
+from sqlalchemy import Numeric, Enum as SQLEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.orm.collections import attribute_mapped_collection
 
@@ -10,13 +10,6 @@ from app.domain.enums import MeasurementUnit, Language
 
 class ServiceLine(Base):
     __tablename__ = "service_lines"
-    __table_args__ = (
-        UniqueConstraint(
-            "service_line",
-            "language",
-            name="unique_service_line_language"
-        ),
-    )
 
     id: Mapped[int] = mapped_column(primary_key=True)
     

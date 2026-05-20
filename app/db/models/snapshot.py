@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
     from app.db.models.invoice_line import InvoiceLine
-    from app.db.models.party import Party
+    from app.db.models.snap_party import SnapParty
     from app.db.models.snap_template import SnapTemplate
 
 from datetime import date, datetime, timezone
@@ -14,7 +14,7 @@ from sqlalchemy import String, Date, DateTime, Enum as SQLEnum, Numeric, Foreign
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
-from app.domain.enums import Currency, Language
+from app.domain.enums import Currency, Language, DocumentType
 
 class Snapshot(Base):
     __tablename__ = "snapshots"
@@ -35,7 +35,9 @@ class Snapshot(Base):
         index=True
     )
 
-    document_type: Mapped[str] = mapped_column(String(25))
+    document_type: Mapped[DocumentType] = mapped_column(
+        SQLEnum(DocumentType, name="document_type_enum")
+    )
 
     issue_date: Mapped[date] = mapped_column(
         Date,
@@ -77,12 +79,12 @@ class Snapshot(Base):
         cascade="all, delete-orphan"
     )
 
-    contractor_id: Mapped[int] = mapped_column(ForeignKey("parties.id"))
+    contractor_id: Mapped[int] = mapped_column(ForeignKey("snap_parties.id"))
 
-    client_id: Mapped[int] = mapped_column(ForeignKey("parties.id"))
+    client_id: Mapped[int] = mapped_column(ForeignKey("snap_parties.id"))
 
-    contractor: Mapped[Party] = relationship(foreign_keys=[contractor_id])
+    contractor: Mapped[SnapParty] = relationship(foreign_keys=[contractor_id])
 
-    client: Mapped[Party] = relationship(foreign_keys=[client_id])
+    client: Mapped[SnapParty] = relationship(foreign_keys=[client_id])
 
     snap_template: Mapped[SnapTemplate] = relationship()

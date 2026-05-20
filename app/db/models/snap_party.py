@@ -9,15 +9,22 @@ if TYPE_CHECKING:
 
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm.collections import attribute_mapped_collection
 
 from app.db.base import Base
+from app.db.models.snap_party_localization import SnapPartyLocalization
+from app.domain.enums import Language
 
-class Party(Base):
-    __tablename__ = "parties"
+class SnapParty(Base):
+    __tablename__ = "snap_parties"
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
-    legal_name: Mapped[str] = mapped_column(String(100))
+    legal_name: Mapped[dict[Language,SnapPartyLocalization]] = relationship(
+        SnapPartyLocalization,
+        collection_class=attribute_mapped_collection("language"),
+        cascade="all, delete-orphan",
+    )
 
     email: Mapped[Optional[str]] = mapped_column(
         String(100),

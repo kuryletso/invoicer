@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
-    from app.db.models.party import Party
+    from app.db.models.snap_party import SnapParty
 
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -23,10 +23,10 @@ class SnapRepresentative(Base):
     )
 
     party_id: Mapped[int] = mapped_column(
-        ForeignKey("parties.id"),
+        ForeignKey("snap_parties.id"),
         nullable=False
     )
 
-    party: Mapped[Party] = relationship(
+    party: Mapped[SnapParty] = relationship(
         back_populates="snap_representative"
     )
