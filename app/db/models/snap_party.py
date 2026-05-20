@@ -20,7 +20,7 @@ class SnapParty(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
-    legal_name: Mapped[dict[Language,SnapPartyLocalization]] = relationship(
+    localizations: Mapped[dict[Language,SnapPartyLocalization]] = relationship(
         SnapPartyLocalization,
         collection_class=attribute_mapped_collection("language"),
         cascade="all, delete-orphan",

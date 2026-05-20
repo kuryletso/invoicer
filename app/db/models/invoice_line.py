@@ -7,11 +7,13 @@ if TYPE_CHECKING:
 
 from decimal import Decimal
 
-from sqlalchemy import String, Enum as SQLEnum, Numeric, ForeignKey
+from sqlalchemy import Enum as SQLEnum, Numeric, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm.collections import attribute_mapped_collection
 
 from app.db.base import Base
-from app.domain.enums import MeasurementUnit
+from app.db.models.invoice_line_localization import InvoiceLineLocalization
+from app.domain.enums import MeasurementUnit, Language
 
 class InvoiceLine(Base):
     __tablename__ = "invoice_lines"
@@ -27,7 +29,11 @@ class InvoiceLine(Base):
         back_populates="invoice_lines"
     )
 
-    description: Mapped[str] = mapped_column(String(255))
+    description: Mapped[dict[Language, InvoiceLineLocalization]] = relationship(
+        InvoiceLineLocalization,
+        collection_class=attribute_mapped_collection("language"),
+        cascade="all, delete-orphan"
+    )
 
     quantity: Mapped[Decimal] = mapped_column(Numeric(12,3))
 

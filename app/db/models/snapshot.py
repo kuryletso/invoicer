@@ -20,7 +20,7 @@ class Snapshot(Base):
     __tablename__ = "snapshots"
     __table_args__ = (
         Index(
-            "idx_snapshot_created_at_issue_date_serial_document_type",
+            "idx_issue_date_serial_document_type",
             "issue_date",
             "serial",
             "document_type"
