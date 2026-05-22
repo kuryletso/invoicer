@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -10,13 +10,13 @@ from app.db.types import LanguageEnum
 from app.domain.enums import Language
 
 if TYPE_CHECKING:
-    from app.db.models.bank_account import BankAccount
+    from app.db.models.snap_bank_account import SnapBankAccount
 
-class BankAccountLocalization(Base):
-    __tablename__ = "bank_account_localizations"
+class SnapBankAccountLocalization(Base):
+    __tablename__ = "snap_bank_account_localizations"
 
     bank_account_id: Mapped[int] = mapped_column(
-        ForeignKey("bank_accounts.id"),
+        ForeignKey("snap_bank_accounts.id"),
         primary_key=True,
     )
 
@@ -25,10 +25,13 @@ class BankAccountLocalization(Base):
         primary_key=True,
     )
 
-    bank_account: Mapped[BankAccount] = relationship(
+    bank_account: Mapped[SnapBankAccount] = relationship(
         back_populates="localizations",
     )
 
-    bank_name: Mapped[str] = mapped_column(String(255))
+    bank_name: Mapped[str] = mapped_column(String(120))
 
-    bank_info: Mapped[str] = mapped_column(String(255))
+    bank_info: Mapped[Optional[str]] = mapped_column(
+        String(255),
+        nullable=True
+    )

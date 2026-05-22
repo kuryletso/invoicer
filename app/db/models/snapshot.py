@@ -1,20 +1,21 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Optional
-
-if TYPE_CHECKING:
-    from app.db.models.invoice_line import InvoiceLine
-    from app.db.models.snap_party import SnapParty
-    from app.db.models.snap_template import SnapTemplate
-
 from datetime import date, datetime, timezone
 from decimal import Decimal
 
-from sqlalchemy import String, Date, DateTime, Enum as SQLEnum, Numeric, ForeignKey, Index
+from sqlalchemy import String, Date, DateTime, ForeignKey, Index
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
+from app.db.types import CurrencyEnum, LanguageEnum, DocumentTypeEnum
 from app.domain.enums import Currency, Language, DocumentType
+from app.domain.constants import MONEY
+
+if TYPE_CHECKING:
+    from app.db.models.snap_invoice_line import SnapInvoiceLine
+    from app.db.models.snap_organization import SnapOrganization
+    from app.db.models.snap_template import SnapTemplate
 
 class Snapshot(Base):
     __tablename__ = "snapshots"
@@ -35,9 +36,7 @@ class Snapshot(Base):
         index=True
     )
 
-    document_type: Mapped[DocumentType] = mapped_column(
-        SQLEnum(DocumentType, name="document_type_enum")
-    )
+    document_type: Mapped[DocumentType] = mapped_column(DocumentTypeEnum)
 
     issue_date: Mapped[date] = mapped_column(
         Date,
@@ -55,36 +54,32 @@ class Snapshot(Base):
         index=True
     )
 
-    currency: Mapped[Currency] = mapped_column(
-        SQLEnum(Currency, name="currency_enum")
-    )
+    currency: Mapped[Currency] = mapped_column(CurrencyEnum)
 
-    primary_language: Mapped[Language] = mapped_column(
-        SQLEnum(Language, name="language_enum")
-    )
+    primary_language: Mapped[Language] = mapped_column(LanguageEnum)
 
     secondary_language: Mapped[Optional[Language]]= mapped_column(
-        SQLEnum(Language, name="language_enum"),
+        LanguageEnum,
         nullable=True
     )
 
-    subtotal: Mapped[Decimal] = mapped_column(Numeric(12,2))
+    subtotal: Mapped[Decimal] = mapped_column(MONEY)
 
-    tax_amount: Mapped[Decimal] = mapped_column(Numeric(12,2))
+    tax_amount: Mapped[Decimal] = mapped_column(MONEY)
 
-    total: Mapped[Decimal] = mapped_column(Numeric(12,2))
+    total: Mapped[Decimal] = mapped_column(MONEY)
 
-    invoice_lines: Mapped[list[InvoiceLine]] = relationship(
+    invoice_lines: Mapped[list[SnapInvoiceLine]] = relationship(
         back_populates="snapshot",
         cascade="all, delete-orphan"
     )
 
-    contractor_id: Mapped[int] = mapped_column(ForeignKey("snap_parties.id"))
+    contractor_id: Mapped[int] = mapped_column(ForeignKey("snap_organizations.id"))
 
-    client_id: Mapped[int] = mapped_column(ForeignKey("snap_parties.id"))
+    client_id: Mapped[int] = mapped_column(ForeignKey("snap_organizations.id"))
 
-    contractor: Mapped[SnapParty] = relationship(foreign_keys=[contractor_id])
+    contractor: Mapped[SnapOrganization] = relationship(foreign_keys=[contractor_id])
 
-    client: Mapped[SnapParty] = relationship(foreign_keys=[client_id])
+    client: Mapped[SnapOrganization] = relationship(foreign_keys=[client_id])
 
-    snap_template: Mapped[SnapTemplate] = relationship()
+    template: Mapped[SnapTemplate] = relationship()
