@@ -1,11 +1,15 @@
 from lxml.etree import _Element
 
+from app.assets.service import AssetService
+from app.document_engine.parser.context import ParserContext
 from app.document_engine.parser.models.inlines import RunNode, ImageNode
 from app.document_engine.parser.namespaces import NS
 
 type ParsedInlineNode = RunNode | ImageNode
 
 WORD_NAMESPACE = NS["w"]
+
+asset_service = AssetService()
 
 def get_attr(node: _Element, attr_name: str) -> str | None:
     return node.get(f"{{{WORD_NAMESPACE}}}{attr_name}")
@@ -28,7 +32,10 @@ def extract_run_style_id(run_properties: _Element | None) -> str | None:
     
     return get_attr(style_node, "val")
 
-def parse_image(run: _Element) -> ImageNode | None:
+def parse_image(
+        run: _Element,
+        context: ParserContext,
+    ) -> ImageNode | None:
     blip = run.find(".//a:blip", NS)
     if blip is None:
         return None
@@ -37,13 +44,26 @@ def parse_image(run: _Element) -> ImageNode | None:
     if relationship_id is None:
         return None
     
-    return ImageNode(asset_id=relationship_id)
+    target = context.relationships.resolve(relationship_id)
+    if target is None:
+        return None
+    
 
-def parse_inline(run: _Element) -> list[ParsedInlineNode]:
+    internal_path = f"word/{target}"    
+    image_bytes = context.archive.read_bytes(internal_path)
+    asset = asset_service.create_image_asset(
+        filename=target,
+        data=image_bytes,
+    )
+
+    return ImageNode(asset_id=asset.id)
+
+
+def parse_inline(run: _Element, context: ParserContext) -> list[ParsedInlineNode]:
 
     result = []
 
-    image = parse_image(run)
+    image = parse_image(run, context)
     if image is not None:
         result.append(image)
 

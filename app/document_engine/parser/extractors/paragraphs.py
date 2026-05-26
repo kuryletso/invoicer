@@ -1,5 +1,6 @@
 from lxml.etree import _Element
 
+from app.document_engine.parser.context import ParserContext
 from app.document_engine.parser.extractors.runs import parse_inline
 from app.document_engine.parser.models.blocks import ParagraphNode
 from app.document_engine.parser.namespaces import NS
@@ -20,12 +21,12 @@ def extract_paragraph_style_id(paragraph_properties: _Element | None) -> str | N
     
     return get_attr(style_node, "val")
 
-def parse_paragraph(paragraph: _Element) -> ParagraphNode:
+def parse_paragraph(paragraph: _Element, context: ParserContext) -> ParagraphNode:
     paragraph_properties = paragraph.find("w:pPr", NS)
 
     inlines = []
     for run in paragraph.findall("w:r", NS):
-        inlines.extend(parse_inline(run))
+        inlines.extend(parse_inline(run, context))
 
     return ParagraphNode(
         inlines=inlines,

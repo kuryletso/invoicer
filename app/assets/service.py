@@ -21,10 +21,7 @@ class AssetService:
 
         sha256_hash = hash_bytes(data)
 
-        existing_asset = self.assets_by_hash.get(
-            sha256_hash,
-        )
-
+        existing_asset = self.assets_by_hash.get(sha256_hash)
         if existing_asset is not None:
             return existing_asset
 
@@ -36,9 +33,7 @@ class AssetService:
         asset = ImageAsset(
             id=generate_asset_id(),
             sha256=sha256_hash,
-            mime_type=detect_mime_type(
-                filename,
-            ),
+            mime_type=detect_mime_type(filename),
             storage_path=storage_path,
             size_bytes=len(data),
         )
