@@ -1,6 +1,7 @@
 from typing import Optional
 from dataclasses import dataclass
 
+
 @dataclass(slots=True, frozen=True)
 class StyleNode:
     style_id: str

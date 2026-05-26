@@ -1,6 +1,7 @@
 from typing import Optional
 from dataclasses import dataclass
 
+
 @dataclass(slots=True, frozen=True)
 class RunNode:
     text: str
@@ -8,6 +9,7 @@ class RunNode:
     italic: bool
     underline: bool
     style_id: Optional[str]
+
 
 @dataclass(slots=True, frozen=True)
 class ImageNode:

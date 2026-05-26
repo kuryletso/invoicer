@@ -1,5 +1,6 @@
 from lxml.etree import _Element
 
+
 class RelationshipResolver:
     def __init__(self, relationships_root: _Element) -> None:
         self.relationships: dict[str, str] = {}

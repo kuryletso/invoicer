@@ -4,6 +4,7 @@ from app.document_engine.blueprint.paragraph import ParagraphBlueprint
 from app.document_engine.blueprint.table import TableBlueprint, RowBlueprint, CellBlueprint
 from app.document_engine.blueprint.segment import TextSegment, PlaceholderSegment, ImageSegment
 
+
 def rebuild_models():
     models = [
         DocumentBlueprint,

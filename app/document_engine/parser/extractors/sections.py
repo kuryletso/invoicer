@@ -5,8 +5,10 @@ from app.document_engine.parser.namespaces import NS
 
 WORD_NAMESPACE = NS["w"]
 
+
 def get_attr(node: _Element, attr_name: str) -> str | None:
     return node.get(f"{{{WORD_NAMESPACE}}}{attr_name}")
+
 
 def parse_section(section: _Element) -> SectionBreakNode:
     section_type = None

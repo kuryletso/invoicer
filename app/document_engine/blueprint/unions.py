@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from app.document_engine.blueprint.table import TableBlueprint
     from app.document_engine.blueprint.segment import TextSegment, PlaceholderSegment, PlaceholderGroupSegment, ImageSegment
 
+
 Segment = Annotated[
     TextSegment
     | PlaceholderSegment
@@ -16,6 +17,7 @@ Segment = Annotated[
     | ImageSegment,
     Field(discriminator="type")
 ]
+
 
 Block = Annotated[
     ParagraphBlueprint

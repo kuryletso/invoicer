@@ -11,6 +11,7 @@ from app.document_engine.parser.extractors.styles import parse_styles
 from app.document_engine.parser.namespaces import NS
 from app.document_engine.parser.relationships import RelationshipResolver
 
+
 class DocxParser:
     def __init__(self, path: Path) -> None:
         self.archive = DocxArchive(path)

@@ -3,6 +3,7 @@ from typing import Optional
 
 from app.document_engine.enums.enums import HorizontalAlignment, VerticalAlignment
 
+
 class ParagraphStyle(BaseModel):
     style_name: Optional[str] = None
     alignment: Optional[HorizontalAlignment] = None
@@ -11,6 +12,7 @@ class ParagraphStyle(BaseModel):
     line_spacing: Optional[float] = None
     space_before: Optional[float] = None
     space_after: Optional[float] = None
+
 
 class TextStyle(BaseModel):
     bold: Optional[bool] = None
@@ -24,12 +26,15 @@ class TextStyle(BaseModel):
     all_caps: Optional[bool] = None
     small_caps: Optional[bool] = None
 
+
 class TableStyle(BaseModel):
     autofit: Optional[bool] = None
     alignment: Optional[HorizontalAlignment] = None
 
+
 class RowStyle(BaseModel):
     height: Optional[float] = None
+
 
 class CellStyle(BaseModel):
     vertical_alignment: Optional[VerticalAlignment] = None

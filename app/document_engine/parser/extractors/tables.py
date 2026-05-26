@@ -5,6 +5,7 @@ from app.document_engine.parser.extractors.paragraphs import parse_paragraph
 from app.document_engine.parser.models.blocks import ParagraphNode, TableCellNode, TableRowNode, TableNode
 from app.document_engine.parser.namespaces import NS
 
+
 def parse_table(table: _Element, context: ParserContext) -> TableNode:
     rows: list[TableRowNode] = []
 

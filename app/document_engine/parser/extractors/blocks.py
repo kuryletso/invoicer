@@ -5,6 +5,7 @@ from app.document_engine.parser.namespaces import NS
 
 BlockEvent = tuple[str, _Element]
 
+
 def iter_blocks(body: _Element) -> Iterator[BlockEvent]:
     for child in body:
         tag = child.tag.split("}")[-1]

@@ -5,6 +5,7 @@ from os import PathLike
 
 from lxml import etree # type: ignore
 
+
 @dataclass(slots=True, frozen=True)
 class DocxPaths:
     document: str = "word/document.xml"
@@ -13,6 +14,7 @@ class DocxPaths:
     relationships: str = "word/_rel/document.xml.rels"
     headers: str = "word/header1.xml"
     footers: str = "word/footer1.xml"
+
 
 class DocxArchive:
     def __init__(self, path: str | PathLike[str]) -> None:

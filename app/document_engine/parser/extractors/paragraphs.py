@@ -7,8 +7,10 @@ from app.document_engine.parser.namespaces import NS
 
 WORD_NAMESPACE = NS["w"]
 
+
 def get_attr(node: _Element, attr_name: str) -> str | None:
     return node.get(f"{{{WORD_NAMESPACE}}}{attr_name}")
+
 
 def extract_paragraph_style_id(paragraph_properties: _Element | None) -> str | None:
     if paragraph_properties is None:
@@ -20,6 +22,7 @@ def extract_paragraph_style_id(paragraph_properties: _Element | None) -> str | N
         return None
     
     return get_attr(style_node, "val")
+
 
 def parse_paragraph(paragraph: _Element, context: ParserContext) -> ParagraphNode:
     paragraph_properties = paragraph.find("w:pPr", NS)

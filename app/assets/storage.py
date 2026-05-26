@@ -2,6 +2,7 @@ from pathlib import Path
 
 from app.assets.paths import ASSET_STORAGE_DIR
 
+
 class AssetStorage:
     def __init__(self, root: Path = ASSET_STORAGE_DIR) -> None:
         self.root = root
