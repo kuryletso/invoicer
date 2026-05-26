@@ -3,6 +3,8 @@ from lxml.etree import _Element
 from app.document_engine.parser.models.inlines import RunNode, ImageNode
 from app.document_engine.parser.namespaces import NS
 
+type ParsedInlineNode = RunNode | ImageNode
+
 WORD_NAMESPACE = NS["w"]
 
 def get_attr(node: _Element, attr_name: str) -> str | None:
@@ -26,13 +28,37 @@ def extract_run_style_id(run_properties: _Element | None) -> str | None:
     
     return get_attr(style_node, "val")
 
-def parse_run(run: _Element) -> RunNode:
-    run_properties = run.find("w:rPr", NS)
+def parse_image(run: _Element) -> ImageNode | None:
+    blip = run.find(".//a:blip", NS)
+    if blip is None:
+        return None
+    
+    relationship_id = blip.get(f"{NS["r"]}embed")
+    if relationship_id is None:
+        return None
+    
+    return ImageNode(asset_id=relationship_id)
 
-    return RunNode(
-        text=extract_run_text(run),
-        bold=has_tag(run_properties, "w:b") if run_properties is not None else False,
-        italic=has_tag(run_properties, "w:i") if run_properties is not None else False,
-        underline=has_tag(run_properties, "w:u") if run_properties is not None else False,
-        style_id=extract_run_style_id(run_properties),
-    )
+def parse_inline(run: _Element) -> list[ParsedInlineNode]:
+
+    result = []
+
+    image = parse_image(run)
+    if image is not None:
+        result.append(image)
+
+    text = extract_run_text(run)
+    if text:
+        run_properties = run.find("w:rPr", NS)
+
+        result.append(
+            RunNode(
+                text=extract_run_text(run),
+                bold=has_tag(run_properties, "w:b") if run_properties is not None else False,
+                italic=has_tag(run_properties, "w:i") if run_properties is not None else False,
+                underline=has_tag(run_properties, "w:u") if run_properties is not None else False,
+                style_id=extract_run_style_id(run_properties),
+            )
+        )
+
+    return result

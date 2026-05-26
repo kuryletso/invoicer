@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Annotated, Union
+from typing import TYPE_CHECKING, Annotated
 
 from pydantic import Field
 
@@ -10,19 +10,15 @@ if TYPE_CHECKING:
     from app.document_engine.blueprint.segment import TextSegment, PlaceholderSegment, PlaceholderGroupSegment, ImageSegment
 
 Segment = Annotated[
-    Union[
-        TextSegment,
-        PlaceholderSegment,
-        PlaceholderGroupSegment,
-        ImageSegment,
-    ],
+    TextSegment
+    | PlaceholderSegment
+    | PlaceholderGroupSegment
+    | ImageSegment,
     Field(discriminator="type")
 ]
 
 Block = Annotated[
-    Union[
-        ParagraphBlueprint,
-        TableBlueprint,
-    ],
+    ParagraphBlueprint
+    | TableBlueprint,
     Field(discriminator="type")
 ]

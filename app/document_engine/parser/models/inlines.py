@@ -11,4 +11,5 @@ class RunNode:
 
 @dataclass(slots=True, frozen=True)
 class ImageNode:
-    relationship_id: str
+    asset_id: str
+    target_path: str | None = None
