@@ -1,0 +1,241 @@
+from lxml.etree import _Element
+
+from app.document_engine.parser.models.styles import (
+    StyleNode,
+    RunStyle,
+    ParagraphStyle,
+    TableStyle,
+    TableRowStyle,
+    TableCellStyle,
+)
+from app.document_engine.parser.namespaces import NS
+from app.document_engine.parser.extractors.styles import (
+    extract_run_style,
+    extract_paragraph_style,
+    extract_table_style,
+    extract_table_row_style,
+    extract_table_cell_style,
+    get_attr,
+)
+from app.document_engine.parser.style_resolver.overlay_dataclass import overlay_dataclass
+
+class StyleResolver:
+    def __init__(self, styles: dict[str, StyleNode]) -> None:
+        self.styles = styles
+        self._resolved_run_styles: dict[str, RunStyle] = {}
+        self._resolved_paragraph_styles: dict[str, ParagraphStyle] = {}
+        self._resolved_table_styles: dict[str, TableStyle] = {}
+        self._resolved_table_row_styles: dict[str, TableRowStyle] = {}
+        self._resolved_table_cell_styles: dict[str, TableCellStyle] = {}
+
+        self.default_run_style = RunStyle(
+            bold=False,
+            italic=False,
+            underline=False,
+            font_name="Calibri",
+            font_size=22,
+            color="000000",
+        )
+
+        self.default_paragraph_style = ParagraphStyle(
+            alignment="left",
+            spacing_before=0,
+            spacing_after=0,
+            indent_left=0,
+            indent_right=0,
+            keep_next=False,
+        )
+
+        self.default_table_style = TableStyle(
+            autofit=True,
+        )
+
+        self.default_table_row_style = TableRowStyle(
+            header=False,
+        )
+
+        self.default_table_cell_style = TableCellStyle(
+            shading="clear",
+            v_alignment="top",
+        )
+
+
+    def resolve_run_style_by_id(self, style_id: str | None) -> RunStyle:
+        if style_id is None:
+            return self.default_run_style
+        
+        cached = self._resolved_run_styles.get(style_id)
+        if cached is not None:
+            return cached
+        
+        style = self.styles.get(style_id)
+
+        if style is None:
+            return self.default_run_style
+        
+        parent_style = self.resolve_run_style_by_id(style.based_on)
+
+        resolved = overlay_dataclass(
+            parent_style,
+            style.run_style,
+        )
+
+        if resolved is None:
+            return self.default_run_style
+        
+        self._resolved_run_styles[style_id] = resolved
+
+        return resolved
+    
+
+    def resolve_run_style(self, run: _Element) -> RunStyle:
+        run_properties = run.find("w:rPr", NS)
+        if run_properties is None:
+            return self.default_run_style
+        
+        style_node = run_properties.find("w:rStyle", NS)
+        style_id = None
+
+        if style_node is not None:
+            style_id = get_attr(style_node, "val")
+
+        base_style = self.resolve_run_style_by_id(style_id)
+
+        direct_style = extract_run_style(run_properties)
+
+        resolved = overlay_dataclass(
+            base_style,
+            direct_style,
+        )
+
+        return resolved or self.default_run_style
+    
+
+    def resolve_paragraph_style_by_id(self, style_id: str | None) -> ParagraphStyle:
+        if style_id is None:
+            return self.default_paragraph_style
+        
+        cached = self._resolved_paragraph_styles.get(style_id)
+        if cached is not None:
+            return cached
+        
+        style = self.styles.get(style_id)
+
+        if style is None:
+            return self.default_paragraph_style
+        
+        parent_style = self.resolve_paragraph_style_by_id(style.based_on)
+
+        resolved = overlay_dataclass(
+            parent_style,
+            style.paragraph_style,
+        )
+
+        if resolved is None:
+            return self.default_paragraph_style
+        
+        self._resolved_paragraph_styles[style_id] = resolved
+
+        return resolved
+    
+
+    def resolved_paragraph_style(self, paragraph: _Element) -> ParagraphStyle:
+        paragraph_properties = paragraph.find("w:pPr", NS)
+        if paragraph_properties is None:
+            return self.default_paragraph_style
+        
+        style_node = paragraph_properties.find("w:pStyle", NS)
+        style_id = None
+
+        if style_node is not None:
+            style_id = get_attr(style_node, "val")
+        
+        base_style = self.resolve_paragraph_style_by_id(style_id)
+
+        direct_style = extract_paragraph_style(paragraph_properties)
+
+        resolved = overlay_dataclass(
+            base_style,
+            direct_style,
+        )
+
+        return resolved or self.default_paragraph_style
+    
+
+    def resolve_table_style_by_id(self, style_id: str | None) -> TableStyle:
+        if style_id is None:
+            return self.default_table_style
+        
+        cached = self._resolved_table_styles.get(style_id)
+        if cached is not None:
+            return cached
+        
+        style = self.styles.get(style_id)
+
+        if style is None:
+            return self.default_table_style
+        
+        parent_style = self.resolve_table_style_by_id(style.based_on)
+
+        resolved = overlay_dataclass(
+            parent_style,
+            style.table_style,
+        )
+
+        if resolved is None:
+            return self.default_table_style
+        
+        self._resolved_table_styles[style_id] = resolved
+
+        return resolved
+    
+    
+    def resolve_table_style(self, table: _Element) -> TableStyle:
+        table_properties = table.find("w:tblPr", NS)
+        if table_properties is None:
+            return self.default_table_style
+        
+        style_node = table_properties.find("w:tblStyle", NS)
+        style_id = None
+        
+        if style_node is not None:
+            style_id = get_attr(style_node, "val")
+
+        base_style = self.resolve_table_style_by_id(style_id)
+
+        direct_style = extract_table_style(table_properties)
+
+        resolved = overlay_dataclass(
+            base_style,
+            direct_style,
+        )
+
+        return resolved or self.default_table_style
+    
+
+    def resolve_row_style(self, table_row: _Element, table_style: TableStyle) -> TableRowStyle:
+        row_properties = table_row.find("w:trPr", NS)
+
+        direct_style = extract_table_row_style(row_properties)
+
+        return direct_style
+    
+    
+    def resolve_cell_style(self, table_cell: _Element, table_style: TableStyle, row_style: TableRowStyle) -> TableCellStyle:
+        cell_properties = table_cell.find("w:tcPr", NS)
+
+        direct_style = extract_table_cell_style(cell_properties)
+
+        inherited_margins = direct_style.margins
+        if inherited_margins is None:
+            inherited_margins = table_style.margins
+
+        resolved = TableCellStyle(
+            shading=direct_style.shading,
+            shading_fill=direct_style.shading_fill,
+            margins=inherited_margins,
+            grid_span=direct_style.grid_span,
+            v_alignment=direct_style.v_alignment,
+        )
+
+        return resolved

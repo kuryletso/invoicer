@@ -1,14 +1,12 @@
-from typing import Optional
 from dataclasses import dataclass
+
+from app.document_engine.parser.models.styles import RunStyle
 
 
 @dataclass(slots=True, frozen=True)
 class RunNode:
     text: str
-    bold: bool
-    italic: bool
-    underline: bool
-    style_id: Optional[str]
+    style: RunStyle
 
 
 @dataclass(slots=True, frozen=True)

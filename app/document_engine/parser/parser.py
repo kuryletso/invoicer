@@ -10,6 +10,7 @@ from app.document_engine.parser.extractors.tables import parse_table
 from app.document_engine.parser.extractors.styles import parse_styles
 from app.document_engine.parser.namespaces import NS
 from app.document_engine.parser.relationships import RelationshipResolver
+from app.document_engine.parser.style_resolver.style_resolver import StyleResolver
 
 
 class DocxParser:
@@ -25,6 +26,7 @@ class DocxParser:
             archive=self.archive,
             relationships=self.relationships,
             asset_service=AssetService(),
+            style_resolver=StyleResolver(self.styles),
         )
 
     def parse(self):
