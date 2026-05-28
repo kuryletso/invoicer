@@ -15,5 +15,5 @@ def parse_paragraph(paragraph: _Element, context: ParserContext) -> ParagraphNod
 
     return ParagraphNode(
         inlines=inlines,
-        style=context.style_resolver.resolved_paragraph_style(paragraph),
+        style=context.style_resolver.resolve_paragraph_style(paragraph),
     )

@@ -11,7 +11,7 @@ class DocxPaths:
     document: str = "word/document.xml"
     styles: str = "word/styles.xml"
     numbering: str = "word/numbering.xml"
-    relationships: str = "word/_rel/document.xml.rels"
+    relationships: str = "word/_rels/document.xml.rels"
     headers: str = "word/header1.xml"
     footers: str = "word/footer1.xml"
 
@@ -21,9 +21,11 @@ class DocxArchive:
         self.path = Path(path)
         self.zip = ZipFile(path)
 
+    _SAFE_PARSER = etree.XMLParser(resolve_entities=False, no_network=True)
+
     def read_xml(self, archive_path: str) -> etree._Element:
         data = self.zip.read(archive_path)
-        return etree.fromstring(data)
+        return etree.fromstring(data, parser=self._SAFE_PARSER)
     
     def read_bytes(self, archive_path: str) -> bytes:
         return self.zip.read(archive_path)

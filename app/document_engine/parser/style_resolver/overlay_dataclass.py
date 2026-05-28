@@ -16,6 +16,11 @@ def overlay_dataclass(base: T | None, override: T | None) -> T | None:
             "Must be a dataclass instance."
         )
     
+    if not is_dataclass(override):
+        raise TypeError(
+            "Must be a dataclass instance."
+        )
+    
     values = {}
 
     for field in fields(base):

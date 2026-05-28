@@ -42,7 +42,8 @@ def has_tag(node: _Element | None, tag: str) -> bool | None:
     if node is None:
         return None
     
-    return node.find(tag, NS) is not None
+    found = node.find(tag, NS)
+    return True if found else None
 
 
 def extract_run_style(run_properties: _Element | None) -> RunStyle:

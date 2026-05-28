@@ -3,6 +3,7 @@ from pathlib import Path
 from app.assets.service import AssetService
 from app.document_engine.parser.archive import DocxArchive, DocxPaths
 from app.document_engine.parser.context import ParserContext
+from app.document_engine.parser.models.blocks import ParagraphNode, TableNode, SectionBreakNode
 from app.document_engine.parser.extractors.blocks import iter_blocks
 from app.document_engine.parser.extractors.paragraphs import parse_paragraph
 from app.document_engine.parser.extractors.sections import parse_section
@@ -12,6 +13,8 @@ from app.document_engine.parser.namespaces import NS
 from app.document_engine.parser.relationships import RelationshipResolver
 from app.document_engine.parser.style_resolver.style_resolver import StyleResolver
 
+type ParsedBlock = ParagraphNode | TableNode | SectionBreakNode
+
 
 class DocxParser:
     def __init__(self, path: Path) -> None:
@@ -19,6 +22,7 @@ class DocxParser:
         self.document_root = self.archive.read_xml(DocxPaths.document)
         self.styles_root = self.archive.read_xml(DocxPaths.styles)
         self.styles = parse_styles(self.styles_root)
+        self.doc_defaults = self.styles_root.find("w:docDefaults", NS)
         self.relationships = RelationshipResolver(
             self.archive.read_xml(DocxPaths.relationships),
         )
@@ -26,10 +30,14 @@ class DocxParser:
             archive=self.archive,
             relationships=self.relationships,
             asset_service=AssetService(),
-            style_resolver=StyleResolver(self.styles),
+            style_resolver=StyleResolver(self.styles, self.doc_defaults),
         )
 
-    def parse(self):
+    def __enter__(self): return self
+
+    def __exit__(self, *_): self.archive.close()
+
+    def parse(self) -> list[ParsedBlock]:
         body = self.document_root.find("w:body", NS)
 
         if body is None:

@@ -20,7 +20,12 @@ from app.document_engine.parser.extractors.styles import (
 from app.document_engine.parser.style_resolver.overlay_dataclass import overlay_dataclass
 
 class StyleResolver:
-    def __init__(self, styles: dict[str, StyleNode]) -> None:
+    def __init__(
+            self,
+            styles: dict[str, StyleNode],
+            doc_defaults: _Element,
+        ) -> None:
+
         self.styles = styles
         self._resolved_run_styles: dict[str, RunStyle] = {}
         self._resolved_paragraph_styles: dict[str, ParagraphStyle] = {}
@@ -28,23 +33,8 @@ class StyleResolver:
         self._resolved_table_row_styles: dict[str, TableRowStyle] = {}
         self._resolved_table_cell_styles: dict[str, TableCellStyle] = {}
 
-        self.default_run_style = RunStyle(
-            bold=False,
-            italic=False,
-            underline=False,
-            font_name="Calibri",
-            font_size=22,
-            color="000000",
-        )
-
-        self.default_paragraph_style = ParagraphStyle(
-            alignment="left",
-            spacing_before=0,
-            spacing_after=0,
-            indent_left=0,
-            indent_right=0,
-            keep_next=False,
-        )
+        self.default_run_style = self._parse_default_run_style(doc_defaults)
+        self.default_paragraph_style = self._parse_default_paragraph_style(doc_defaults)
 
         self.default_table_style = TableStyle(
             autofit=True,
@@ -59,6 +49,59 @@ class StyleResolver:
             v_alignment="top",
         )
 
+
+    def _parse_default_run_style(self, doc_defaults: _Element | None) -> RunStyle:
+        fallback = RunStyle(
+            bold=False,
+            italic=False,
+            underline=False,
+            font_name="Calibri",
+            font_size=22,
+            color="000000",
+        )
+
+        if doc_defaults is None:
+            return fallback
+        
+        run_properties = doc_defaults.find("w:rPrDefault/w:rPr", NS)
+        if run_properties is None:
+            return fallback
+
+        extracted = extract_run_style(run_properties)
+
+        resolved = overlay_dataclass(
+            fallback,
+            extracted,
+        )
+
+        return resolved or fallback
+    
+
+    def _parse_default_paragraph_style(self, doc_defaults: _Element | None) -> ParagraphStyle:
+        fallback = ParagraphStyle(
+            alignment="left",
+            spacing_before=0,
+            spacing_after=0,
+            indent_left=0,
+            indent_right=0,
+            keep_next=False,
+        )
+
+        if doc_defaults is None:
+            return fallback
+        
+        paragraph_properties = doc_defaults.find("w:pPrDefault/w:pPr", NS)
+        if paragraph_properties is None:
+            return fallback
+        
+        extracted = extract_paragraph_style(paragraph_properties)
+
+        resolved = overlay_dataclass(
+            fallback,
+            extracted,
+        )
+
+        return resolved or fallback
 
     def resolve_run_style_by_id(self, style_id: str | None) -> RunStyle:
         if style_id is None:
@@ -139,7 +182,7 @@ class StyleResolver:
         return resolved
     
 
-    def resolved_paragraph_style(self, paragraph: _Element) -> ParagraphStyle:
+    def resolve_paragraph_style(self, paragraph: _Element) -> ParagraphStyle:
         paragraph_properties = paragraph.find("w:pPr", NS)
         if paragraph_properties is None:
             return self.default_paragraph_style
@@ -218,7 +261,12 @@ class StyleResolver:
 
         direct_style = extract_table_row_style(row_properties)
 
-        return direct_style
+        resolved = overlay_dataclass(
+            self.default_table_row_style,
+            direct_style,
+        )
+
+        return resolved or direct_style
     
     
     def resolve_cell_style(self, table_cell: _Element, table_style: TableStyle, row_style: TableRowStyle) -> TableCellStyle:

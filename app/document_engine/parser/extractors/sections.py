@@ -32,7 +32,7 @@ def parse_section(section: _Element) -> SectionBreakNode:
         page_width = get_attr(page_size, "w")
         page_height = get_attr(page_size, "h")
 
-    page_margins = section.find("w:pgMar")
+    page_margins = section.find("w:pgMar", NS)
     if page_margins is not None:
         margin_header = get_attr(page_margins, "header")
         margin_footer = get_attr(page_margins, "footer")
