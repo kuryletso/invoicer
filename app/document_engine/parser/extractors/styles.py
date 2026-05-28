@@ -43,7 +43,10 @@ def has_tag(node: _Element | None, tag: str) -> bool | None:
         return None
     
     found = node.find(tag, NS)
-    return True if found else None
+    if found is None:
+        return None
+    val = get_attr(found, "val")
+    return val != "0"
 
 
 def extract_run_style(run_properties: _Element | None) -> RunStyle:

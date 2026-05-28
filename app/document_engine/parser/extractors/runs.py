@@ -4,7 +4,7 @@ from pathlib import PurePosixPath
 from app.document_engine.parser.context import ParserContext
 from app.document_engine.parser.models.inlines import RunNode, ImageNode
 from app.document_engine.parser.namespaces import NS
-from app.document_engine.parser.errors import ParserSecurityError, ParserAssetError
+from app.document_engine.parser.errors import ParserSecurityError, ParserAssetError, ParserFormatError, UnsupportedFeatureError
 
 type ParsedInlineNode = RunNode | ImageNode
 
@@ -49,25 +49,31 @@ def parse_image(run: _Element, context: ParserContext) -> ImageNode | None:
     if relationship_id is None:
         return None
     
-    target = context.relationships.resolve(relationship_id)
-    if target is None:
+    relationship = context.relationships.get(relationship_id)
+    if relationship is None:
         return None
+    if relationship.is_external:
+        raise UnsupportedFeatureError(
+            "External image references are not supported."
+        )
+    
+    target = relationship.target
     
     normalized_path = PurePosixPath(target)
 
-    image_bytes = None
+    uncompressed_size = context.archive.get_uncompressed_size(normalized_path.as_posix())
+    if uncompressed_size > MAX_IMAGE_SIZE_BYTES:
+        raise ParserSecurityError(
+            f"Image exceeds size limit:"
+            f"{uncompressed_size} bytes."
+        )
+    
     try:
         image_bytes = context.archive.read_bytes(normalized_path.as_posix())
-    except KeyError as e:
+    except ParserFormatError as e:
         raise ParserAssetError(
             f"Invalid image reference {target}."
         ) from e
-
-    if image_bytes and len(image_bytes) > MAX_IMAGE_SIZE_BYTES:
-        raise ParserSecurityError(
-            f"Image exceeds maximum allowed size:"
-            f"{len(image_bytes)} bytes."
-        )
 
     asset = context.asset_service.create_image_asset(
         filename=PurePosixPath(target).name,

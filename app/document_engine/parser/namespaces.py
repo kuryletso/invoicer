@@ -4,4 +4,5 @@ NS = {
     "wp": "http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing",
     "a": "http://schemas.openxmlformats.org/drawingml/2006/main",
     "pic": "http://schemas.openxmlformats.org/drawingml/2006/picture",
+    "pr": "http://schemas.openxmlformats.org/package/2006/relationships",
 }

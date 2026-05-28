@@ -50,13 +50,6 @@ class RelationshipResolver:
     def get(self, relationship_id: str) -> Relationship | None:
         return self._relationships.get(relationship_id)
     
-    def resolve(self, relationship_id: str) -> str | None:
-        relationship = self.get(relationship_id)
-        if relationship is None:
-            return None
-        
-        return relationship.target
-    
     @staticmethod
     def _normalize_target(target: str) -> str:
         path = PurePosixPath(target)

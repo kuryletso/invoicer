@@ -107,23 +107,20 @@ class StyleResolver:
     def resolve_run_style_by_id(
             self,
             style_id: str | None,
-            visited: set[str] | None = None,            
+            visited: frozenset[str] = frozenset(),            
         ) -> RunStyle:
 
         if style_id is None:
             return self.default_run_style
         
-        if visited is None:
-            visited = set()
+        cached = self._resolved_run_styles.get(style_id)
+        if cached is not None:
+            return cached
+
         if style_id in visited:
             raise StyleResolutionError(
                 f"Circular style dependency detected: {style_id}"
             )
-        visited.add(style_id)
-
-        cached = self._resolved_run_styles.get(style_id)
-        if cached is not None:
-            return cached
         
         style = self.styles.get(style_id)
 
@@ -137,7 +134,7 @@ class StyleResolver:
         
         parent_style = self.resolve_run_style_by_id(
             style.based_on,
-            visited,
+            visited | {style_id},
         )
 
         resolved = overlay_dataclass(
@@ -179,23 +176,20 @@ class StyleResolver:
     def resolve_paragraph_style_by_id(
             self,
             style_id: str | None,
-            visited: set[str] | None = None,
+            visited: frozenset[str] = frozenset(),
         ) -> ParagraphStyle:
 
         if style_id is None:
             return self.default_paragraph_style
         
-        if visited is None:
-            visited = set()
+        cached = self._resolved_paragraph_styles.get(style_id)
+        if cached is not None:
+            return cached
+
         if style_id in visited:
             raise StyleResolutionError(
                 f"Circular style dependency detected: {style_id}"
             )
-        visited.add(style_id)
-
-        cached = self._resolved_paragraph_styles.get(style_id)
-        if cached is not None:
-            return cached
         
         style = self.styles.get(style_id)
 
@@ -209,7 +203,7 @@ class StyleResolver:
 
         parent_style = self.resolve_paragraph_style_by_id(
             style.based_on,
-            visited,
+            visited | {style_id},
         )
 
         resolved = overlay_dataclass(
@@ -251,23 +245,20 @@ class StyleResolver:
     def resolve_table_style_by_id(
             self,
             style_id: str | None,
-            visited: set[str] | None = None
+            visited: frozenset[str] = frozenset(),
         ) -> TableStyle:
 
         if style_id is None:
            return self.default_table_style
         
-        if visited is None:
-            visited = set()
+        cached = self._resolved_table_styles.get(style_id)
+        if cached is not None:
+            return cached
+
         if style_id in visited:
             raise StyleResolutionError(
                 f"Circular style dependency detected: {style_id}"
             )
-        visited.add(style_id)
-
-        cached = self._resolved_table_styles.get(style_id)
-        if cached is not None:
-            return cached
         
         style = self.styles.get(style_id)
 
@@ -281,7 +272,7 @@ class StyleResolver:
 
         parent_style = self.resolve_table_style_by_id(
             style.based_on,
-            visited,
+            visited | {style_id},
         )
 
         resolved = overlay_dataclass(

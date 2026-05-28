@@ -56,6 +56,14 @@ class DocxArchive:
                 f"Missing XML part: {archive_path}."
             ) from e
     
+    def get_uncompressed_size(self, archive_path: str) -> int:
+        try:
+            return self.zip.getinfo(archive_path).file_size
+        except KeyError as e:
+            raise ParserFormatError(
+                f"Missing part: {archive_path}."
+            ) from e
+
     def exists(self, archive_path: str) -> bool:
         return archive_path in self.zip.namelist()
     

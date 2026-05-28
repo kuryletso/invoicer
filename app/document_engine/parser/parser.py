@@ -12,6 +12,7 @@ from app.document_engine.parser.extractors.styles import parse_styles
 from app.document_engine.parser.namespaces import NS
 from app.document_engine.parser.relationships import RelationshipResolver
 from app.document_engine.parser.style_resolver.style_resolver import StyleResolver
+from app.document_engine.parser.errors import ParserFormatError
 
 type ParsedBlock = ParagraphNode | TableNode | SectionBreakNode
 
@@ -41,7 +42,9 @@ class DocxParser:
         body = self.document_root.find("w:body", NS)
 
         if body is None:
-            raise ValueError("Document body not found")
+            raise ParserFormatError(
+                "Document body not found."
+            )
         
         result = []
 

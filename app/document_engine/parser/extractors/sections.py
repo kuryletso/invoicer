@@ -78,9 +78,9 @@ def parse_section(section: _Element) -> SectionBreakNode:
             case "first":
                 first_header_id = relationship_id
 
-    for footer_rederence in section.findall("w:footerReference", NS):
-        reference_type = get_attr(footer_rederence, "type")
-        relationship_id = get_relationship_id(footer_rederence)
+    for footer_reference in section.findall("w:footerReference", NS):
+        reference_type = get_attr(footer_reference, "type")
+        relationship_id = get_relationship_id(footer_reference)
 
         if relationship_id is None:
             continue
