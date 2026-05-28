@@ -18,6 +18,7 @@ from app.document_engine.parser.extractors.styles import (
     get_attr,
 )
 from app.document_engine.parser.style_resolver.overlay_dataclass import overlay_dataclass
+from app.document_engine.parser.errors import StyleResolutionError
 
 class StyleResolver:
     def __init__(
@@ -103,10 +104,22 @@ class StyleResolver:
 
         return resolved or fallback
 
-    def resolve_run_style_by_id(self, style_id: str | None) -> RunStyle:
+    def resolve_run_style_by_id(
+            self,
+            style_id: str | None,
+            visited: set[str] | None = None,            
+        ) -> RunStyle:
+
         if style_id is None:
             return self.default_run_style
         
+        visited = visited or set()
+        if style_id in visited:
+            raise StyleResolutionError(
+                f"Circular style dependency detected: {style_id}"
+            )
+        visited.add(style_id)
+
         cached = self._resolved_run_styles.get(style_id)
         if cached is not None:
             return cached
@@ -116,7 +129,10 @@ class StyleResolver:
         if style is None:
             return self.default_run_style
         
-        parent_style = self.resolve_run_style_by_id(style.based_on)
+        parent_style = self.resolve_run_style_by_id(
+            style.based_on,
+            visited,
+        )
 
         resolved = overlay_dataclass(
             parent_style,
@@ -154,10 +170,22 @@ class StyleResolver:
         return resolved or self.default_run_style
     
 
-    def resolve_paragraph_style_by_id(self, style_id: str | None) -> ParagraphStyle:
+    def resolve_paragraph_style_by_id(
+            self,
+            style_id: str | None,
+            visited: set | None = None,
+        ) -> ParagraphStyle:
+
         if style_id is None:
             return self.default_paragraph_style
         
+        visited = visited or set()
+        if style_id in visited:
+            raise StyleResolutionError(
+                f"Circular style dependency detected: {style_id}"
+            )
+        visited.add(style_id)
+
         cached = self._resolved_paragraph_styles.get(style_id)
         if cached is not None:
             return cached
@@ -167,7 +195,10 @@ class StyleResolver:
         if style is None:
             return self.default_paragraph_style
         
-        parent_style = self.resolve_paragraph_style_by_id(style.based_on)
+        parent_style = self.resolve_paragraph_style_by_id(
+            style.based_on,
+            visited,
+        )
 
         resolved = overlay_dataclass(
             parent_style,
@@ -205,10 +236,22 @@ class StyleResolver:
         return resolved or self.default_paragraph_style
     
 
-    def resolve_table_style_by_id(self, style_id: str | None) -> TableStyle:
+    def resolve_table_style_by_id(
+            self,
+            style_id: str | None,
+            visited: set | None = None
+        ) -> TableStyle:
+
         if style_id is None:
-            return self.default_table_style
+           return self.default_table_style
         
+        visited = visited or set()
+        if style_id in visited:
+            raise StyleResolutionError(
+                f"Circular style dependency detected: {style_id}"
+            )
+        visited.add(style_id)
+
         cached = self._resolved_table_styles.get(style_id)
         if cached is not None:
             return cached
@@ -218,7 +261,10 @@ class StyleResolver:
         if style is None:
             return self.default_table_style
         
-        parent_style = self.resolve_table_style_by_id(style.based_on)
+        parent_style = self.resolve_table_style_by_id(
+            style.based_on,
+            visited,
+        )
 
         resolved = overlay_dataclass(
             parent_style,
@@ -266,7 +312,7 @@ class StyleResolver:
             direct_style,
         )
 
-        return resolved or direct_style
+        return resolved or self.default_table_row_style
     
     
     def resolve_cell_style(self, table_cell: _Element, table_style: TableStyle, row_style: TableRowStyle) -> TableCellStyle:

@@ -1,4 +1,3 @@
-from typing import Optional
 from dataclasses import dataclass
 
 from app.document_engine.parser.models.inlines import RunNode, ImageNode

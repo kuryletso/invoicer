@@ -5,6 +5,8 @@ from os import PathLike
 
 from lxml import etree # type: ignore
 
+from app.document_engine.parser.errors import ParserFormatError
+
 
 @dataclass(slots=True, frozen=True)
 class DocxPaths:
@@ -12,8 +14,6 @@ class DocxPaths:
     styles: str = "word/styles.xml"
     numbering: str = "word/numbering.xml"
     relationships: str = "word/_rels/document.xml.rels"
-    headers: str = "word/header1.xml"
-    footers: str = "word/footer1.xml"
 
 
 class DocxArchive:
@@ -21,11 +21,26 @@ class DocxArchive:
         self.path = Path(path)
         self.zip = ZipFile(path)
 
-    _SAFE_PARSER = etree.XMLParser(resolve_entities=False, no_network=True)
+    _SAFE_PARSER = etree.XMLParser(
+        resolve_entities=False,
+        no_network=True,
+        huge_tree=False,
+    )
 
     def read_xml(self, archive_path: str) -> etree._Element:
-        data = self.zip.read(archive_path)
-        return etree.fromstring(data, parser=self._SAFE_PARSER)
+        try:
+            data = self.zip.read(archive_path)
+        except KeyError as e:
+            raise ParserFormatError(
+                f"Missing XML part: {archive_path}."
+            ) from e
+        
+        try:
+            return etree.fromstring(data, parser=self._SAFE_PARSER)
+        except etree.XMLSyntaxError as e:
+            raise ParserFormatError(
+                f"Invalid XML in part: {archive_path}."
+            ) from e
     
     def read_bytes(self, archive_path: str) -> bytes:
         return self.zip.read(archive_path)

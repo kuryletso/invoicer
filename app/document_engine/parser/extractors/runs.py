@@ -4,6 +4,7 @@ from pathlib import PurePosixPath
 from app.document_engine.parser.context import ParserContext
 from app.document_engine.parser.models.inlines import RunNode, ImageNode
 from app.document_engine.parser.namespaces import NS
+from app.document_engine.parser.errors import ParserSecurityError
 
 type ParsedInlineNode = RunNode | ImageNode
 
@@ -51,26 +52,31 @@ def parse_image(run: _Element, context: ParserContext) -> ImageNode | None:
     if target is None:
         return None
     
-    path_base = PurePosixPath("word")
-    internal_path = (path_base / target).as_posix()
-    normalized_parts: list[str] = []
-    for part in PurePosixPath(internal_path).parts:
-        if part in ("", "."):
-            continue
-        if part == "..":
-            if normalized_parts:
-                normalized_parts.pop()
-            continue
-        normalized_parts.append(part)
-    normalized_path = PurePosixPath(*normalized_parts)
-    if normalized_path.parts or normalized_path.parts[0] != "word":
-        raise ValueError(
-            f"Suspicous image paht: {target}."
+    normalized_path = PurePosixPath(target)
+    if normalized_path.is_absolute():
+        raise ParserSecurityError(
+            "Invalid image path."
+        )
+
+    if ".." in normalized_path.parts:
+        raise ParserSecurityError(
+            f"Suspicous image path: {target}."
         )
     
-    image_bytes = context.archive.read_bytes(normalized_path.as_posix())
+    if not normalized_path.parts or normalized_path.parts[0] != "word":
+        raise ParserSecurityError(
+            f"Suspicous image path: {target}."
+        )
+    
+    image_bytes = None
+    try:
+        image_bytes = context.archive.read_bytes(normalized_path.as_posix())
+    except KeyError: # TODO: need Parser error handling
+        raise KeyError(
+            "Invalid image reference."
+        )
 
-    if len(image_bytes) > MAX_IMAGE_SIZE_BYTES:
+    if image_bytes and len(image_bytes) > MAX_IMAGE_SIZE_BYTES:
         raise ValueError(
             f"Image exceeds maximum allowed size:"
             f"{len(image_bytes)} bytes."
