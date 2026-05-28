@@ -4,6 +4,7 @@ from pathlib import PurePosixPath
 from lxml.etree import _Element
 
 from app.document_engine.parser.namespaces import NS
+from app.document_engine.parser.errors import ParserSecurityError
 
 PACKAGE_ROOT = PurePosixPath("word")
 
@@ -58,5 +59,13 @@ class RelationshipResolver:
     
     @staticmethod
     def _normalize_target(target: str) -> str:
-        normalized = PACKAGE_ROOT / PurePosixPath(target)
-        return str(normalized)
+        path = PurePosixPath(target)
+        if path.is_absolute():
+            raise ParserSecurityError(
+                f"Invalid relationship path: {target}."
+            )
+        if ".." in path.parts:
+            raise ParserSecurityError(
+                f"Invalid relationship path: {target}."
+            )
+        return str(PACKAGE_ROOT / path)

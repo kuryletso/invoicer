@@ -113,7 +113,8 @@ class StyleResolver:
         if style_id is None:
             return self.default_run_style
         
-        visited = visited or set()
+        if visited is None:
+            visited = set()
         if style_id in visited:
             raise StyleResolutionError(
                 f"Circular style dependency detected: {style_id}"
@@ -128,6 +129,11 @@ class StyleResolver:
 
         if style is None:
             return self.default_run_style
+        
+        if style.style_type != "character":
+            raise StyleResolutionError(
+                f"Invalid style type: {style_id}."
+            )
         
         parent_style = self.resolve_run_style_by_id(
             style.based_on,
@@ -173,13 +179,14 @@ class StyleResolver:
     def resolve_paragraph_style_by_id(
             self,
             style_id: str | None,
-            visited: set | None = None,
+            visited: set[str] | None = None,
         ) -> ParagraphStyle:
 
         if style_id is None:
             return self.default_paragraph_style
         
-        visited = visited or set()
+        if visited is None:
+            visited = set()
         if style_id in visited:
             raise StyleResolutionError(
                 f"Circular style dependency detected: {style_id}"
@@ -195,6 +202,11 @@ class StyleResolver:
         if style is None:
             return self.default_paragraph_style
         
+        if style.style_type != "paragraph":
+            raise StyleResolutionError(
+                f"Invalid style type: {style_id}."
+            )
+
         parent_style = self.resolve_paragraph_style_by_id(
             style.based_on,
             visited,
@@ -239,13 +251,14 @@ class StyleResolver:
     def resolve_table_style_by_id(
             self,
             style_id: str | None,
-            visited: set | None = None
+            visited: set[str] | None = None
         ) -> TableStyle:
 
         if style_id is None:
            return self.default_table_style
         
-        visited = visited or set()
+        if visited is None:
+            visited = set()
         if style_id in visited:
             raise StyleResolutionError(
                 f"Circular style dependency detected: {style_id}"
@@ -261,6 +274,11 @@ class StyleResolver:
         if style is None:
             return self.default_table_style
         
+        if style.style_type != "table":
+            raise StyleResolutionError(
+                f"Invalid style type: {style_id}."
+            )
+
         parent_style = self.resolve_table_style_by_id(
             style.based_on,
             visited,

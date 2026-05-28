@@ -4,7 +4,7 @@ from pathlib import PurePosixPath
 from app.document_engine.parser.context import ParserContext
 from app.document_engine.parser.models.inlines import RunNode, ImageNode
 from app.document_engine.parser.namespaces import NS
-from app.document_engine.parser.errors import ParserSecurityError
+from app.document_engine.parser.errors import ParserSecurityError, ParserAssetError
 
 type ParsedInlineNode = RunNode | ImageNode
 
@@ -23,7 +23,8 @@ def extract_run_text(run: _Element) -> str:
 
         if tag == f"{{{NS["w"]}}}t":
             if child.text:
-                parts.append(child.text)
+                text = child.text or ""
+                parts.append(text)
 
         elif tag == f"{{{NS["w"]}}}tab":
             parts.append("\t")
@@ -53,31 +54,17 @@ def parse_image(run: _Element, context: ParserContext) -> ImageNode | None:
         return None
     
     normalized_path = PurePosixPath(target)
-    if normalized_path.is_absolute():
-        raise ParserSecurityError(
-            "Invalid image path."
-        )
 
-    if ".." in normalized_path.parts:
-        raise ParserSecurityError(
-            f"Suspicous image path: {target}."
-        )
-    
-    if not normalized_path.parts or normalized_path.parts[0] != "word":
-        raise ParserSecurityError(
-            f"Suspicous image path: {target}."
-        )
-    
     image_bytes = None
     try:
         image_bytes = context.archive.read_bytes(normalized_path.as_posix())
-    except KeyError: # TODO: need Parser error handling
-        raise KeyError(
-            "Invalid image reference."
-        )
+    except KeyError as e:
+        raise ParserAssetError(
+            f"Invalid image reference {target}."
+        ) from e
 
     if image_bytes and len(image_bytes) > MAX_IMAGE_SIZE_BYTES:
-        raise ValueError(
+        raise ParserSecurityError(
             f"Image exceeds maximum allowed size:"
             f"{len(image_bytes)} bytes."
         )

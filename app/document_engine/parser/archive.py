@@ -21,6 +21,12 @@ class DocxArchive:
         self.path = Path(path)
         self.zip = ZipFile(path)
 
+    def __enter__(self):
+        return self
+    
+    def __exit__(self, *_):
+        self.close()
+
     _SAFE_PARSER = etree.XMLParser(
         resolve_entities=False,
         no_network=True,
@@ -43,7 +49,12 @@ class DocxArchive:
             ) from e
     
     def read_bytes(self, archive_path: str) -> bytes:
-        return self.zip.read(archive_path)
+        try:
+            return self.zip.read(archive_path)
+        except KeyError as e:
+            raise ParserFormatError(
+                f"Missing XML part: {archive_path}."
+            ) from e
     
     def exists(self, archive_path: str) -> bool:
         return archive_path in self.zip.namelist()
