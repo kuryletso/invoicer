@@ -140,13 +140,13 @@ def extract_table_cell_style(cell_properties: _Element | None) -> TableCellStyle
         right_node = margins_node.find("w:right", NS)
 
         if top_node is not None:
-            top = get_int_attr(top_node, "w") or 0
+            top = get_int_attr(top_node, "w")
         if bottom_node is not None:
-            bottom = get_int_attr(bottom_node, "w") or 0
+            bottom = get_int_attr(bottom_node, "w")
         if left_node is not None:
-            left = get_int_attr(left_node, "w") or 0
+            left = get_int_attr(left_node, "w")
         if right_node is not None:
-            right = get_int_attr(right_node, "w") or 0
+            right = get_int_attr(right_node, "w")
 
         margins = Margins(
             top=top,
@@ -241,13 +241,13 @@ def extract_table_style(table_properties: _Element | None) -> TableStyle:
         right_node = margins_node.find("w:right", NS)
 
         if top_node is not None:
-            top = get_int_attr(top_node, "w") or 0
+            top = get_int_attr(top_node, "w")
         if bottom_node is not None:
-            bottom = get_int_attr(bottom_node, "w") or 0
+            bottom = get_int_attr(bottom_node, "w")
         if left_node is not None:
-            left = get_int_attr(left_node, "w") or 0
+            left = get_int_attr(left_node, "w")
         if right_node is not None:
-            right = get_int_attr(right_node, "w") or 0
+            right = get_int_attr(right_node, "w")
 
         margins = Margins(
             top=top,

@@ -15,9 +15,27 @@ def get_attr(node: _Element, attr_name: str) -> str | None:
 
 
 def extract_run_text(run: _Element) -> str:
-    texts = run.findall("w:t", NS)
+    parts: list[str] = []
 
-    return "".join(text.text or "" for text in texts)
+    for child in run:
+        tag = child.tag
+
+        if tag == f"{{{NS["w"]}}}t":
+            if child.text:
+                parts.append(child.text)
+
+        elif tag == f"{{{NS["w"]}}}tab":
+            parts.append("\t")
+
+        elif tag == f"{{{NS["w"]}}}cr":
+            parts.append("\n")
+
+        elif tag == f"{{{NS["w"]}}}br":
+            br_type = child.get(f"{{{NS["w"]}}}type")
+            if br_type in (None, "textWrapping"):
+                parts.append("\n")
+
+    return "".join(parts)
 
 
 def parse_image(run: _Element, context: ParserContext) -> ImageNode | None:

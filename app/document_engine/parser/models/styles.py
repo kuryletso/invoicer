@@ -23,10 +23,10 @@ class ParagraphStyle:
 
 @dataclass(slots=True, frozen=True)
 class Margins:
-    top: int = 0
-    bottom: int = 0
-    left: int = 0
-    right: int = 0
+    top: Optional[int] = None
+    bottom: Optional[int] = None
+    left: Optional[int] = None
+    right: Optional[int] = None
 
 @dataclass(slots=True, frozen=True)
 class TableCellStyle:
@@ -62,6 +62,23 @@ class TableStyle:
     border_inside_h: Optional[TableBorderStyle] = None
     margins: Optional[Margins] = None
 
+
+@dataclass(slots=True, frozen=True)
+class SectionStyle:
+    section_type: Optional[str] = None
+    page_width: Optional[int] = None
+    page_height: Optional[int] = None
+    orientation: Optional[str] = None
+    margin_header: Optional[int] = None
+    margin_footer: Optional[int] = None
+    margins: Optional[Margins] = None
+    default_header_id: Optional[str] = None
+    even_header_id: Optional[str] = None
+    first_header_id: Optional[str] = None
+    default_footer_id: Optional[str] = None
+    even_footer_id: Optional[str] = None
+    first_footer_id: Optional[str] = None
+    
 
 @dataclass(slots=True, frozen=True)
 class StyleNode:

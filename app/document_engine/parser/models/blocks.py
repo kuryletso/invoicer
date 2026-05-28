@@ -2,7 +2,7 @@ from typing import Optional
 from dataclasses import dataclass
 
 from app.document_engine.parser.models.inlines import RunNode, ImageNode
-from app.document_engine.parser.models.styles import ParagraphStyle, TableCellStyle, TableRowStyle, TableStyle
+from app.document_engine.parser.models.styles import ParagraphStyle, TableCellStyle, TableRowStyle, TableStyle, SectionStyle
 
 type ParsedInlineNode = RunNode | ImageNode
 
@@ -32,13 +32,4 @@ class TableNode:
 
 @dataclass(slots=True, frozen=True)
 class SectionBreakNode:
-    section_type: Optional[str]
-    page_width: Optional[str]
-    page_height: Optional[str]
-    orientation: Optional[str]
-    margin_header: Optional[str]
-    margin_footer: Optional[str]
-    margin_top: Optional[str]
-    margin_bottom: Optional[str]
-    margin_left: Optional[str]
-    margin_right: Optional[str]
+    style: SectionStyle
