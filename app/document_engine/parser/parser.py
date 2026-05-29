@@ -55,6 +55,6 @@ class DocxParser:
                 case "table":
                     result.append(parse_table(node, self.context))
                 case "section":
-                    result.append(parse_section(node))
+                    result.append(parse_section(node, self.context))
 
         return result

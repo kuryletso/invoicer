@@ -72,12 +72,12 @@ class SectionStyle:
     margin_header: Optional[int] = None
     margin_footer: Optional[int] = None
     margins: Optional[Margins] = None
-    default_header_id: Optional[str] = None
-    even_header_id: Optional[str] = None
-    first_header_id: Optional[str] = None
-    default_footer_id: Optional[str] = None
-    even_footer_id: Optional[str] = None
-    first_footer_id: Optional[str] = None
+    # default_header_id: Optional[str] = None
+    # even_header_id: Optional[str] = None
+    # first_header_id: Optional[str] = None
+    # default_footer_id: Optional[str] = None
+    # even_footer_id: Optional[str] = None
+    # first_footer_id: Optional[str] = None
     
 
 @dataclass(slots=True, frozen=True)

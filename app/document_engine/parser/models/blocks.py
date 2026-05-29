@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 from app.document_engine.parser.models.inlines import RunNode, ImageNode
+from app.document_engine.parser.models.header_footer import HeaderFooterNode, HeaderFooterType
 from app.document_engine.parser.models.styles import ParagraphStyle, TableCellStyle, TableRowStyle, TableStyle, SectionStyle
 
 type ParsedInlineNode = RunNode | ImageNode
@@ -32,3 +33,8 @@ class TableNode:
 @dataclass(slots=True, frozen=True)
 class SectionBreakNode:
     style: SectionStyle
+    headers: dict[HeaderFooterType, HeaderFooterNode]
+    footers: dict[HeaderFooterType, HeaderFooterNode]
+
+
+type BlockNode = ParagraphNode | TableNode

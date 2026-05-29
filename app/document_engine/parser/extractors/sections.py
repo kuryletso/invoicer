@@ -1,7 +1,10 @@
 from lxml.etree import _Element
 
+from app.document_engine.parser.extractors.header_footer import parse_header_footer_by_id
 from app.document_engine.parser.models.blocks import SectionBreakNode
+from app.document_engine.parser.models.header_footer import HeaderFooterNode, HeaderFooterType
 from app.document_engine.parser.models.styles import SectionStyle, Margins
+from app.document_engine.parser.context import ParserContext
 from app.document_engine.parser.namespaces import NS
 
 WORD_NAMESPACE = NS["w"]
@@ -26,7 +29,7 @@ def get_int_attr(node: _Element, attr_name: str) -> int | None:
 def get_relationship_id(node: _Element) -> str | None:
     return node.get(f"{{{RELATIONSHIP_NAMESPACE}}}id")
 
-def parse_section(section: _Element) -> SectionBreakNode:
+def parse_section(section: _Element, context: ParserContext) -> SectionBreakNode:
     section_type = None
     orientation = None
     page_width = None
@@ -37,12 +40,6 @@ def parse_section(section: _Element) -> SectionBreakNode:
     margin_bottom = None
     margin_left = None
     margin_right = None
-    default_header_id = None
-    even_header_id = None
-    first_header_id = None
-    default_footer_id = None
-    even_footer_id = None
-    first_footer_id = None
 
     type_node = section.find("w:type", NS)
     if type_node is not None:
@@ -63,35 +60,46 @@ def parse_section(section: _Element) -> SectionBreakNode:
         margin_left = get_int_attr(page_margins, "left")
         margin_right = get_int_attr(page_margins, "right")
 
-    for header_reference in section.findall("w:headerReference", NS):
-        reference_type = get_attr(header_reference, "type")
-        relationship_id = get_relationship_id(header_reference)
+    headers: dict[HeaderFooterType, HeaderFooterNode] = {}
+    footers: dict[HeaderFooterType, HeaderFooterNode] = {}
 
+    for header_reference in section.findall("w:headerReference", NS):
+        reference_type_attr = get_attr(header_reference, "type")
+        try:
+            reference_type = HeaderFooterType(reference_type_attr)
+        except ValueError:
+            continue
+
+        relationship_id = get_relationship_id(header_reference)
         if relationship_id is None:
             continue
 
-        match reference_type:
-            case "default":
-                default_header_id = relationship_id
-            case "even":
-                even_header_id = relationship_id
-            case "first":
-                first_header_id = relationship_id
+        header = parse_header_footer_by_id(
+            relationship_id,
+            reference_type,
+            context=context, # TODO: headers/footers have dedicated .rels; currently reuses document.xml rels which breaks meadia/hyperlinks inside headers/footers
+        )
+        if header is not None:
+            headers[header.type] = header
 
     for footer_reference in section.findall("w:footerReference", NS):
-        reference_type = get_attr(footer_reference, "type")
-        relationship_id = get_relationship_id(footer_reference)
+        reference_type_attr = get_attr(footer_reference, "type")
+        try:
+            reference_type = HeaderFooterType(reference_type_attr)
+        except ValueError:
+            continue
 
+        relationship_id = get_relationship_id(footer_reference)
         if relationship_id is None:
             continue
 
-        match reference_type:
-            case "default":
-                default_footer_id = relationship_id
-            case "even":
-                even_footer_id = relationship_id
-            case "first":
-                first_footer_id = relationship_id
+        footer = parse_header_footer_by_id(
+            relationship_id,
+            reference_type,
+            context=context, # TODO: headers/footers have dedicated .rels; currently reuses document.xml rels which breaks meadia/hyperlinks inside headers/footers
+        )
+        if footer is not None:
+            footers[footer.type] = footer
 
     return SectionBreakNode(
         style=SectionStyle(
@@ -107,11 +115,7 @@ def parse_section(section: _Element) -> SectionBreakNode:
                 left=margin_left,
                 right=margin_right,
             ),
-            default_header_id=default_header_id,
-            even_header_id=even_header_id,
-            first_header_id=first_header_id,
-            default_footer_id=default_footer_id,
-            even_footer_id=even_footer_id,
-            first_footer_id=first_footer_id,
-        )
+        ),
+        headers=headers,
+        footers=footers,
     )
