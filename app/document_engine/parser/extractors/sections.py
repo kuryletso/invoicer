@@ -1,8 +1,9 @@
 from lxml.etree import _Element
 
+from app.document_engine.enums.enums import HeaderFooterType
 from app.document_engine.parser.extractors.header_footer import parse_header_footer_by_id
 from app.document_engine.parser.models.blocks import SectionBreakNode
-from app.document_engine.parser.models.header_footer import HeaderFooterNode, HeaderFooterType
+from app.document_engine.parser.models.header_footer import HeaderFooterNode
 from app.document_engine.parser.models.styles import SectionStyle, Margins
 from app.document_engine.parser.context import ParserContext
 from app.document_engine.parser.namespaces import NS

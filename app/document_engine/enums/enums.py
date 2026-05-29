@@ -12,3 +12,9 @@ class VerticalAlignment(StrEnum):
     TOP = "top"
     CENTER = "center"
     BOTTOM = "bottom"
+
+
+class HeaderFooterType(StrEnum):
+    DEFAULT = "default"
+    FIRST = "first"
+    EVEN = "even"

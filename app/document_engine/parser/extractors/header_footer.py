@@ -1,7 +1,8 @@
+from app.document_engine.enums.enums import HeaderFooterType
 from app.document_engine.parser.extractors.paragraphs import parse_paragraph 
 from app.document_engine.parser.extractors.tables import parse_table 
 from app.document_engine.parser.models.blocks import BlockNode
-from app.document_engine.parser.models.header_footer import HeaderFooterType, HeaderFooterNode
+from app.document_engine.parser.models.header_footer import HeaderFooterNode
 from app.document_engine.parser.context import ParserContext
 from app.document_engine.parser.namespaces import NS
 
