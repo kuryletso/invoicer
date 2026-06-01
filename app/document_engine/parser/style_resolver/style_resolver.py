@@ -17,7 +17,7 @@ from app.document_engine.parser.extractors.styles import (
     extract_table_cell_style,
     get_attr,
 )
-from app.document_engine.parser.style_resolver.overlay_dataclass import overlay_dataclass
+from app.document_engine.utils.overlay_dataclass import overlay_dataclass
 from app.document_engine.parser.errors import StyleResolutionError
 
 class StyleResolver:
