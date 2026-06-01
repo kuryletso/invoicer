@@ -53,6 +53,7 @@ class TableBorderStyle:
 @dataclass(slots=True, frozen=True)
 class TableStyle:
     width: Optional[int] = None
+    width_type: Optional[str] = None
     autofit: Optional[bool] = None
     border_top: Optional[TableBorderStyle] = None
     border_bottom: Optional[TableBorderStyle] = None

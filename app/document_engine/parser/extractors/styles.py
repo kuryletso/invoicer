@@ -198,8 +198,10 @@ def extract_table_style(table_properties: _Element | None) -> TableStyle:
     
     width_node = table_properties.find(OOXMLTableAttributeNames.width, NS)
     width = None
+    width_type = None
     if width_node is not None:
         width = get_int_attr(width_node, "w")
+        width_type = get_attr(width_node, "type")
 
     layout_node = table_properties.find(OOXMLTableAttributeNames.layout, NS)
     autofit = None
@@ -261,6 +263,7 @@ def extract_table_style(table_properties: _Element | None) -> TableStyle:
 
     return TableStyle(
         width=width,
+        width_type=width_type,
         autofit=autofit,
         border_top=border_top,
         border_bottom=border_bottom,
