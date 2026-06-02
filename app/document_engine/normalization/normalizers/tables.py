@@ -31,6 +31,11 @@ def normalize_table_width(value: int | None, type: str | None) -> NormalizedTabl
     if type is None:
         return DEFAULT_TABLE_WIDTH
     
+    if type != "auto" and value is None:
+        raise NormalizationFormatError(
+            f"Missing table width value for table type {type}."
+        )
+    
     try:
         return NormalizedTableWidth(
             value=value,
@@ -38,14 +43,19 @@ def normalize_table_width(value: int | None, type: str | None) -> NormalizedTabl
         )
     except ValueError as e:
         raise NormalizationFormatError(
-            f"Invalid table width attribute: type '{type}', value '{value}'."
+            f"Invalid table width attribute: {type=}, {value=}."
         ) from e
 
 
 def normalize_table_border(border: TableBorderStyle | None) -> NormalizedTableBorder:
     if border is None:
         return DEFAULT_TABLE_BORDER
-    
+
+    if isinstance(border.size, int) and border.size < 0:
+        raise NormalizationFormatError(
+            f"Table border size can't be negative, got {border.size=}."
+        )
+
     try:
         parsed_style = NormalizedTableBorder(
             # Fields may be None here; overlay_dataclass_strict() immediately applies defaults.
@@ -70,6 +80,11 @@ def normalize_row_style(row_style: TableRowStyle | None) -> NormalizedRowStyle:
     if row_style is None:
         return DEFAULT_ROW_STYLE
     
+    if isinstance(row_style.height, int) and row_style.height < 1:
+        raise NormalizationFormatError(
+            f"Table row height must be at least 1, got {row_style.height=}."
+        )
+
     parsed_style = NormalizedRowStyle(
         # Fields may be None here; overlay_dataclass_strict() immediately applies defaults.
         height=cast(int, row_style.height),
@@ -86,6 +101,11 @@ def normalize_cell_style(cell_style: TableCellStyle | None) -> NormalizedCellSty
     if cell_style is None:
         return DEFAULT_CELL_STYLE
     
+    if isinstance(cell_style.grid_span, int) and cell_style.grid_span < 1:
+        raise NormalizationFormatError(
+            f"Table cell span must be at least 1, got {cell_style.grid_span=}"
+        )
+
     try:
         parsed_style = NormalizedCellStyle(
             # Fields may be None here; overlay_dataclass_strict() immediately applies defaults.

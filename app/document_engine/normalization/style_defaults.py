@@ -78,7 +78,7 @@ DEFAULT_CELL_STYLE = NormalizedCellStyle(
 )
 
 
-DEAFAULT_SECTION_STYLE = NormalizedSectionStyle(
+DEFAULT_SECTION_STYLE = NormalizedSectionStyle(
     section_type=SectionType("nextPage"),
     page_width=12240,
     page_height=15840,

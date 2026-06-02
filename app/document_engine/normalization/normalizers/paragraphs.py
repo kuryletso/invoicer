@@ -7,12 +7,25 @@ from app.document_engine.normalization.errors import NormalizationFormatError
 
 from app.document_engine.parser.models.blocks import ParagraphNode
 from app.document_engine.parser.models.inlines import RunNode, RunStyle, ImageNode
+from app.document_engine.parser.models.styles import ParagraphStyle
 
 from app.document_engine.enums.enums import ParagraphAlignment
 from app.document_engine.utils.overlay_dataclass import overlay_dataclass_strict
 
 
+
+def _validate_text_style_attributes(run_style: RunStyle) -> None:
+
+    if isinstance(run_style.font_size, int) and run_style.font_size < 1:
+        raise NormalizationFormatError(
+            f"Font size must be at least 1, got {run_style.font_size}"
+        )
+
+
 def normalize_text_style(run_style: RunStyle) -> NormalizedTextStyle:
+
+    _validate_text_style_attributes(run_style)
+
     # Fields may be None here; overlay_dataclass_strict() immediately applies defaults.
     parsed_style = NormalizedTextStyle(
             bold=cast(bool, run_style.bold),
@@ -28,7 +41,31 @@ def normalize_text_style(run_style: RunStyle) -> NormalizedTextStyle:
         parsed_style,
     )
 
+
+def _validate_paragraph_style_attributes(paragraph_style: ParagraphStyle) -> None:
+
+    if isinstance(paragraph_style.spacing_before, int) and paragraph_style.spacing_before < 0:
+        raise NormalizationFormatError(
+            f"Paragraph spacing_before can't be lower than 0, got {paragraph_style.spacing_before}"
+        )
+    if isinstance(paragraph_style.spacing_after, int) and paragraph_style.spacing_after < 0:
+        raise NormalizationFormatError(
+            f"Paragraph spacing_after can't be lower than 0, got {paragraph_style.spacing_after}"
+        )
+    if isinstance(paragraph_style.indent_left, int) and paragraph_style.indent_left < 0:
+        raise NormalizationFormatError(
+            f"Paragraph indent_left can't be lower than 0, got {paragraph_style.indent_left}"
+        )
+    if isinstance(paragraph_style.indent_right, int) and paragraph_style.indent_right < 0:
+        raise NormalizationFormatError(
+            f"Paragraph indent_right can't be lower than 0, got {paragraph_style.indent_right}"
+        )
+
+
 def normalize_paragraph(paragraph: ParagraphNode) -> NormalizedParagraph:
+
+    _validate_paragraph_style_attributes(paragraph.style)
+
     normalized_inlines: list[NormalizedInlineNode] = []
     current_text = ""
     current_style: RunStyle | None = None

@@ -6,11 +6,12 @@ from app.document_engine.normalization.models.sections import NormalizedSection,
 from app.document_engine.normalization.normalizers.paragraphs import normalize_paragraph
 from app.document_engine.normalization.normalizers.tables import normalize_table
 from app.document_engine.normalization.normalizers.shared import normalize_margins
-from app.document_engine.normalization.style_defaults import DEAFAULT_SECTION_STYLE
+from app.document_engine.normalization.style_defaults import DEFAULT_SECTION_STYLE
 from app.document_engine.normalization.errors import NormalizationFormatError
 
 from app.document_engine.parser.models.blocks import SectionBreakNode, ParagraphNode, TableNode
 from app.document_engine.parser.models.header_footer import HeaderFooterNode
+from app.document_engine.parser.models.styles import SectionStyle
 
 from app.document_engine.enums.enums import SectionType, PageOrientation, HeaderFooterType
 from app.document_engine.utils.overlay_dataclass import overlay_dataclass_strict
@@ -54,11 +55,33 @@ def normalize_headers_footers(
                 blocks=tuple(blocks),
             )
 
-        preset[t.value] = normalized
+        preset[t] = normalized
         
     return NormalizedHeaderFooterGroup(
-        **preset,
+        default=preset.get(HeaderFooterType.DEFAULT),
+        first=preset.get(HeaderFooterType.FIRST),
+        even=preset.get(HeaderFooterType.EVEN),
     )
+
+
+def _validate_section_style_attributes(section_style: SectionStyle) -> None:
+
+    if isinstance(section_style.page_width, int) and section_style.page_width < 1:
+        raise NormalizationFormatError(
+            f"Page width must be at least 1, got {section_style.page_width}."
+        )
+    if isinstance(section_style.page_height, int) and section_style.page_height < 1:
+        raise NormalizationFormatError(
+            f"Page height must be at least 1, got {section_style.page_height}."
+        )
+    if isinstance(section_style.margin_header, int) and section_style.margin_header < 0:
+        raise NormalizationFormatError(
+            f"Page header margin can't be negative value, got {section_style.margin_header}."
+        )
+    if isinstance(section_style.margin_footer, int) and section_style.margin_footer < 1:
+        raise NormalizationFormatError(
+            f"Page footer margin can't be negative value, got {section_style.margin_footer}."
+        )
 
 
 def normalize_section(
@@ -66,6 +89,8 @@ def normalize_section(
     blocks: list[NormalizedBlock],
 ) -> NormalizedSection:
     
+    _validate_section_style_attributes(ancestor.style)
+
     try:
         section_type = SectionType(ancestor.style.section_type) \
             if ancestor.style.section_type is not None \
@@ -97,7 +122,7 @@ def normalize_section(
     )
 
     normalized_style = overlay_dataclass_strict(
-        DEAFAULT_SECTION_STYLE,
+        DEFAULT_SECTION_STYLE,
         parsed_style,
     )
 
