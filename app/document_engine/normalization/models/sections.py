@@ -1,28 +1,26 @@
-from typing import Optional
-
 from dataclasses import dataclass
 
-from app.document_engine.normalization.models.blocks import NormalizedParagraphNode, NormalizedTableNode
-from app.document_engine.normalization.models.section_style import NormalizedSectionStyle
+from app.document_engine.normalization.models.blocks import NormalizedBlock
+from app.document_engine.normalization.models.header_footer import NormalizedHeaderFooterGroup
+from app.document_engine.normalization.models.shared import NormalizedMargins
 
-type NormalizedBlock = NormalizedParagraphNode | NormalizedTableNode
+from app.document_engine.enums.enums import SectionType, PageOrientation
+
+
+@dataclass(slots=True, frozen=True)
+class NormalizedSectionStyle:
+    section_type: SectionType
+    page_width: int             # twips
+    page_height: int            # twips
+    orientation: PageOrientation
+    margin_header: int          # twips
+    margin_footer: int          # twips
+    margins: NormalizedMargins
 
 
 @dataclass(slots=True, frozen=True)
 class NormalizedSection:
-    blocks: tuple[NormalizedBlock]
+    blocks: tuple[NormalizedBlock, ...]
+    headers: NormalizedHeaderFooterGroup
+    footers: NormalizedHeaderFooterGroup
     style: NormalizedSectionStyle
-
-
-@dataclass(slots=True)
-class NormalizedSectionBuilder:
-    blocks: list[NormalizedBlock] = []
-    page_width: Optional[int] = None
-    page_height: Optional[int] = None
-    orientation: Optional[int] = None
-    margin_header: Optional[int] = None
-    margin_footer: Optional[int] = None
-    margin_top: Optional[int] = None
-    margin_bottom: Optional[int] = None
-    margin_left: Optional[int] = None
-    margin_right: Optional[int] = None

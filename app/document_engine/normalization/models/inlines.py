@@ -1,6 +1,14 @@
 from dataclasses import dataclass
 
-from app.document_engine.normalization.models.inline_style import NormalizedTextStyle
+
+@dataclass(slots=True, frozen=True)
+class NormalizedTextStyle:
+    bold: bool
+    italic: bool
+    underline: bool
+    font_name: str
+    font_size: int      # half-points
+    color: str
 
 
 @dataclass(slots=True, frozen=True)

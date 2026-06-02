@@ -1,24 +1,34 @@
-from app.document_engine.normalization.models.blocks import NormalizedParagraphNode
-from app.document_engine.normalization.models.inlines import NormalizedTextNode, NormalizedImageNode, NormalizedInlineNode
-from app.document_engine.normalization.models.inline_style import NormalizedTextStyle
+from typing import cast
+
+from app.document_engine.normalization.models.blocks import NormalizedParagraph, NormalizedParagraphStyle
+from app.document_engine.normalization.models.inlines import NormalizedTextNode, NormalizedImageNode, NormalizedInlineNode, NormalizedTextStyle
+from app.document_engine.normalization.style_defaults import DEFAULT_TEXT_STYLE, DEFAULT_PARAGRAPH_STYLE
+from app.document_engine.normalization.errors import NormalizationFormatError
 
 from app.document_engine.parser.models.blocks import ParagraphNode
 from app.document_engine.parser.models.inlines import RunNode, RunStyle, ImageNode
 
+from app.document_engine.enums.enums import ParagraphAlignment
+from app.document_engine.utils.overlay_dataclass import overlay_dataclass_strict
+
 
 def normalize_text_style(run_style: RunStyle) -> NormalizedTextStyle:
-    return NormalizedTextStyle(
-        bold=run_style.bold,
-        italic=run_style.italic,
-        underline=run_style.underline,
-        font_name=run_style.font_name,
-        font_size=run_style.font_size,
-        color=run_style.color,
-        style_id=run_style.style_id,
+    # Fields may be None here; overlay_dataclass_strict() immediately applies defaults.
+    parsed_style = NormalizedTextStyle(
+            bold=cast(bool, run_style.bold),
+            italic=cast(bool,run_style.italic),
+            underline=cast(bool,run_style.underline),
+            font_name=cast(str, run_style.font_name),
+            font_size=cast(int, run_style.font_size),
+            color=cast(str, run_style.color),
+        )
+
+    return overlay_dataclass_strict(
+        DEFAULT_TEXT_STYLE,
+        parsed_style,
     )
 
-
-def normalize_paragraph(paragraph: ParagraphNode) -> NormalizedParagraphNode:
+def normalize_paragraph(paragraph: ParagraphNode) -> NormalizedParagraph:
     normalized_inlines: list[NormalizedInlineNode] = []
     current_text = ""
     current_style: RunStyle | None = None
@@ -55,13 +65,28 @@ def normalize_paragraph(paragraph: ParagraphNode) -> NormalizedParagraphNode:
             )
 
         else:
-            raise TypeError(
+            raise NormalizationFormatError(
                 f"Unsupported inline node type: {type(node).__name__}."
             )
         
     flush_text()
 
-    return NormalizedParagraphNode(
+    parsed_style = NormalizedParagraphStyle(
+        # Fields may be None here; overlay_dataclass_strict() immediately applies defaults.
+        alignment=cast(ParagraphAlignment, ParagraphAlignment(paragraph.style.alignment) \
+            if paragraph.style.alignment is not None \
+            else None),
+        spacing_before=cast(int, paragraph.style.spacing_before),
+        spacing_after=cast(int, paragraph.style.spacing_after),
+        indent_left=cast(int, paragraph.style.indent_left),
+        indent_right=cast(int, paragraph.style.indent_right),
+        keep_next=cast(bool, paragraph.style.keep_next),
+    )
+
+    return NormalizedParagraph(
         inlines=tuple(normalized_inlines),
-        style_id=paragraph.style_id,
+        style=overlay_dataclass_strict(
+            DEFAULT_PARAGRAPH_STYLE,
+            parsed_style,
+        )
     )
