@@ -19,6 +19,8 @@ from app.document_engine.normalization.style_defaults import (
     DEFAULT_TABLE_STYLE,
     DEFAULT_ROW_STYLE,
     DEFAULT_CELL_STYLE,
+    DEFAULT_CELL_MARGINS,
+    DEFAULT_TABLE_MARGINS,
 )
 
 from app.document_engine.parser.models.blocks import TableNode, TableRowStyle, TableCellStyle
@@ -26,6 +28,7 @@ from app.document_engine.parser.models.styles import TableBorderStyle
 
 from app.document_engine.enums.enums import TableWidthType, TableBorderStyleEnum, TableCellShading, VerticalAlignment
 from app.document_engine.utils.overlay_dataclass import overlay_dataclass_strict
+
 
 def normalize_table_width(value: int | None, type: str | None) -> NormalizedTableWidth:
     if type is None:
@@ -57,18 +60,20 @@ def normalize_table_border(border: TableBorderStyle | None) -> NormalizedTableBo
         )
 
     try:
-        parsed_style = NormalizedTableBorder(
-            # Fields may be None here; overlay_dataclass_strict() immediately applies defaults.
-            style=cast(TableBorderStyleEnum, TableBorderStyleEnum(border.style) \
-                if border.style is not None \
-                else None),
-            size=cast(int, border.size),
-            color=cast(str, border.color),
-        )
+        style = TableBorderStyleEnum(border.style) \
+            if border.style is not None \
+            else None
     except ValueError as e:
         raise NormalizationFormatError(
             f"Invalid border style: '{border.style}'."
         ) from e
+
+    parsed_style = NormalizedTableBorder(
+        # Fields may be None here; overlay_dataclass_strict() immediately applies defaults.
+        style=cast(TableBorderStyleEnum, style),
+        size=cast(int, border.size),
+        color=cast(str, border.color),
+    )
 
     return overlay_dataclass_strict(
         DEFAULT_TABLE_BORDER,
@@ -107,27 +112,40 @@ def normalize_cell_style(cell_style: TableCellStyle | None) -> NormalizedCellSty
         )
 
     try:
-        parsed_style = NormalizedCellStyle(
-            # Fields may be None here; overlay_dataclass_strict() immediately applies defaults.
-            shading=cast(TableCellShading, TableCellShading(cell_style.shading) \
-                if cell_style.shading is not None \
-                else None),
-                shading_fill=cast(str, cell_style.shading_fill),
-                margins=normalize_margins(cell_style.margins),
-                grid_span=cast(int, cell_style.grid_span),
-                v_alignment=cast(VerticalAlignment, VerticalAlignment(cell_style.v_alignment) \
-                    if cell_style.v_alignment is not None \
-                    else None),
-        )
+        shading = TableCellShading(cell_style.shading) \
+            if cell_style.shading is not None \
+            else None
     except ValueError as e:
         raise NormalizationFormatError(
-            f"Invalid cell shading type: {cell_style.shading}."
+            f"Invalid cell shading: '{cell_style.shading}'."
         ) from e
+    
+    try:
+        v_alignment = VerticalAlignment(cell_style.v_alignment) \
+            if cell_style.v_alignment is not None \
+            else None
+    except ValueError as e:
+        raise NormalizationFormatError(
+            f"Invalid cell v_alignment: '{cell_style.v_alignment}'."
+        ) from e
+
+    parsed_style = NormalizedCellStyle(
+        shading=cast(TableCellShading, shading),
+        shading_fill=cast(str, cell_style.shading_fill),
+        margins=normalize_margins(
+            margins=cell_style.margins,
+            default=DEFAULT_CELL_MARGINS,
+        ),
+        grid_span=cast(int, cell_style.grid_span),
+        v_alignment=cast(VerticalAlignment, v_alignment),
+    )
+
     
     return overlay_dataclass_strict(
         DEFAULT_CELL_STYLE,
         parsed_style,
     )
+
 
 def normalize_table(table: TableNode) -> NormalizedTable:
 
@@ -144,7 +162,10 @@ def normalize_table(table: TableNode) -> NormalizedTable:
         border_right=normalize_table_border(table.style.border_right),
         border_inside_v=normalize_table_border(table.style.border_inside_v),
         border_inside_h=normalize_table_border(table.style.border_inside_h),
-        margins=normalize_margins(table.style.margins),
+        margins=normalize_margins(
+            margins=table.style.margins,
+            default=DEFAULT_TABLE_MARGINS,
+        ),
     )
 
     normalized_style = overlay_dataclass_strict(

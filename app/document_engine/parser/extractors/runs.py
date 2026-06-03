@@ -23,8 +23,7 @@ def extract_run_text(run: _Element) -> str:
 
         if tag == f"{{{NS["w"]}}}t":
             if child.text:
-                text = child.text or ""
-                parts.append(text)
+                parts.append(child.text)
 
         elif tag == f"{{{NS["w"]}}}tab":
             parts.append("\t")

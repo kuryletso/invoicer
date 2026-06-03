@@ -31,12 +31,14 @@ DEFAULT_TABLE_WIDTH = NormalizedTableWidth(
     type=TableWidthType("auto"),
 )
 
+
 DEFAULT_TABLE_MARGINS = NormalizedMargins(
     top=0,
     bottom=0,
     left=108,
     right=108,
 )
+
 
 DEFAULT_TABLE_BORDER = NormalizedTableBorder(
     style=TableBorderStyleEnum("none"),
@@ -64,17 +66,28 @@ DEFAULT_ROW_STYLE = NormalizedRowStyle(
 )
 
 
+DEFAULT_CELL_MARGINS = NormalizedMargins(
+    top=0,
+    bottom=0,
+    left=108,
+    right=108,
+)
+
+
 DEFAULT_CELL_STYLE = NormalizedCellStyle(
     shading=TableCellShading("clear"),
     shading_fill="FFFFFF",
-    margins=NormalizedMargins(
-        top=0,
-        bottom=0,
-        left=108,
-        right=108,
-    ),
+    margins=DEFAULT_CELL_MARGINS,
     grid_span=1,
     v_alignment=VerticalAlignment("top"),
+)
+
+
+DEFAULT_SECTION_MARGINS = NormalizedMargins(
+    top=1440,
+    bottom=1440,
+    left=1440,
+    right=1440,
 )
 
 
@@ -85,10 +98,5 @@ DEFAULT_SECTION_STYLE = NormalizedSectionStyle(
     orientation=PageOrientation("portrait"),
     margin_header=720,
     margin_footer=720,
-    margins=NormalizedMargins(
-        top=1440,
-        bottom=1440,
-        left=1440,
-        right=1440,
-    ),
+    margins=DEFAULT_SECTION_MARGINS,
 )

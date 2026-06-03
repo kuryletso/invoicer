@@ -6,7 +6,7 @@ from app.document_engine.normalization.models.sections import NormalizedSection,
 from app.document_engine.normalization.normalizers.paragraphs import normalize_paragraph
 from app.document_engine.normalization.normalizers.tables import normalize_table
 from app.document_engine.normalization.normalizers.shared import normalize_margins
-from app.document_engine.normalization.style_defaults import DEFAULT_SECTION_STYLE
+from app.document_engine.normalization.style_defaults import DEFAULT_SECTION_STYLE, DEFAULT_SECTION_MARGINS
 from app.document_engine.normalization.errors import NormalizationFormatError
 
 from app.document_engine.parser.models.blocks import SectionBreakNode, ParagraphNode, TableNode
@@ -78,7 +78,7 @@ def _validate_section_style_attributes(section_style: SectionStyle) -> None:
         raise NormalizationFormatError(
             f"Page header margin can't be negative value, got {section_style.margin_header}."
         )
-    if isinstance(section_style.margin_footer, int) and section_style.margin_footer < 1:
+    if isinstance(section_style.margin_footer, int) and section_style.margin_footer < 0:
         raise NormalizationFormatError(
             f"Page footer margin can't be negative value, got {section_style.margin_footer}."
         )
@@ -118,7 +118,10 @@ def normalize_section(
         orientation=cast(PageOrientation, orientation),
         margin_header=cast(int, ancestor.style.margin_header),
         margin_footer=cast(int, ancestor.style.margin_footer),
-        margins=normalize_margins(ancestor.style.margins),
+        margins=normalize_margins(
+            margins=ancestor.style.margins,
+            default=DEFAULT_SECTION_MARGINS,
+        ),
     )
 
     normalized_style = overlay_dataclass_strict(

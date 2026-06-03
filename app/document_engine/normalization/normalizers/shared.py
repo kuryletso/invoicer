@@ -1,5 +1,4 @@
 from app.document_engine.normalization.models.shared import NormalizedMargins
-from app.document_engine.normalization.style_defaults import DEFAULT_TABLE_MARGINS
 from app.document_engine.normalization.errors import NormalizationFormatError
 
 from app.document_engine.parser.models.styles import Margins
@@ -10,9 +9,13 @@ from app.document_engine.utils.overlay_dataclass import overlay_dataclass_strict
 from typing import cast
 
 
-def normalize_margins(margins: Margins | None) -> NormalizedMargins:
+def normalize_margins(
+    margins: Margins | None,
+    default: NormalizedMargins,
+) -> NormalizedMargins:
+    
     if margins is None:
-        return DEFAULT_TABLE_MARGINS
+        return default
 
     if isinstance(margins.top, int) and margins.top < 0:
         raise NormalizationFormatError(
@@ -40,6 +43,6 @@ def normalize_margins(margins: Margins | None) -> NormalizedMargins:
     )
 
     return overlay_dataclass_strict(
-        DEFAULT_TABLE_MARGINS,
+        default,
         parsed_margins,
     )
