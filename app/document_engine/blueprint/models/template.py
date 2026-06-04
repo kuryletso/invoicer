@@ -7,5 +7,5 @@ class PlaceholderDefinition(BlueprintBase):
 
 
 class TemplateBlueprint(BlueprintBase):
-    sections: list[SectionBlueprint]
+    sections: tuple[SectionBlueprint, ...]
     placeholders: dict[str, PlaceholderDefinition]

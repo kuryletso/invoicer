@@ -17,5 +17,5 @@ class ParagraphStyleBlueprint(BlueprintBase):
 
 class ParagraphBlueprint(BlueprintBase):
     type: Literal["paragraph"] = "paragraph"
-    segments: list[BlueprintSegment]
+    segments: tuple[BlueprintSegment, ...]
     style: ParagraphStyleBlueprint

@@ -5,8 +5,8 @@ from app.document_engine.blueprint.models.table import TableBlueprint, RowBluepr
 from app.document_engine.blueprint.models.segment import (
     TextSegment,
     PlaceholderSegment,
-    PlaceholderJoinSegment,
-    PlaceholderGroupSegment,
+    JoinedPlaceholderSegment,
+    GroupedPlaceholderSegment,
     ImageSegment,
 )
 
@@ -23,7 +23,7 @@ __all__ = [
     "CellBlueprint",
     "TextSegment",
     "PlaceholderSegment",
-    "PlaceholderJoinSegment",
-    "PlaceholderGroupSegment",
+    "JoinedPlaceholderSegment",
+    "GroupedPlaceholderSegment",
     "ImageSegment",
 ]

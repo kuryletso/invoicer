@@ -48,16 +48,16 @@ class TableStyleBlueprint(BlueprintBase):
 
 
 class CellBlueprint(BlueprintBase):
-    blocks: list[BlueprintBlock]
-    style = CellStyleBlueprint
+    blocks: tuple[BlueprintBlock, ...]
+    style: CellStyleBlueprint
 
 
 class RowBlueprint(BlueprintBase):
-    cells: list[CellBlueprint]
-    style = RowStyleBlueprint
+    cells: tuple[CellBlueprint, ...]
+    style: RowStyleBlueprint
 
 
 class TableBlueprint(BlueprintBase):
     type: Literal["table"] = "table"
-    rows: list[RowBlueprint]
+    rows: tuple[RowBlueprint, ...]
     style: TableStyleBlueprint

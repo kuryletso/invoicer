@@ -17,7 +17,7 @@ class SectionStyleBlueprint(BlueprintBase):
 
 
 class SectionBlueprint(BlueprintBase):
-    blocks: list[BlueprintBlock]
+    blocks: tuple[BlueprintBlock, ...]
     headers: HeaderFooterGroupBlueprint
     footers: HeaderFooterGroupBlueprint
     style: SectionStyleBlueprint

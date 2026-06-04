@@ -10,8 +10,8 @@ if TYPE_CHECKING:
     from app.document_engine.blueprint.models.segment import (
         TextSegment,
         PlaceholderSegment,
-        PlaceholderJoinSegment,
-        PlaceholderGroupSegment,
+        JoinedPlaceholderSegment,
+        GroupedPlaceholderSegment,
         ImageSegment,
     )
 
@@ -19,8 +19,8 @@ if TYPE_CHECKING:
 BlueprintSegment = Annotated[
     TextSegment
     | PlaceholderSegment
-    | PlaceholderJoinSegment
-    | PlaceholderGroupSegment
+    | JoinedPlaceholderSegment
+    | GroupedPlaceholderSegment
     | ImageSegment,
     Field(discriminator="type")
 ]

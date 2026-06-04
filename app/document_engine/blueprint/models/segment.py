@@ -24,22 +24,20 @@ class PlaceholderSegment(BlueprintBase):
     style: TextStyleBlueprint
 
 
-class PlaceholderJoinSegment(BlueprintBase):
+class JoinedPlaceholderSegment(BlueprintBase):
     type: Literal["placeholder_join"] = "placeholder_join"
     items: tuple[TextSegment | PlaceholderSegment, ...]
     separator: str
     style: TextStyleBlueprint
 
 
-class PlaceholderGroupSegment(BlueprintBase):
+class GroupedPlaceholderSegment(BlueprintBase):
     type: Literal["placeholder_group"] = "placeholder_group"
     items: tuple[tuple[TextSegment | PlaceholderSegment, ...], ...]
-    serparator: str
+    separator: str
     style: TextStyleBlueprint
 
 
 class ImageSegment(BlueprintBase):
     type: Literal["image"] = "image"
-    asset_id: int
-    width: int
-    height: int
+    asset_id: str
