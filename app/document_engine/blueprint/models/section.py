@@ -1,0 +1,23 @@
+from app.document_engine.blueprint.models.blueprint_base import BlueprintBase
+from app.document_engine.blueprint.models.header_footer import HeaderFooterGroupBlueprint
+from app.document_engine.blueprint.models.margins import MarginsBlueprint
+from app.document_engine.blueprint.models.unions import BlueprintBlock
+
+from app.document_engine.enums.enums import SectionType, PageOrientation
+
+
+class SectionStyleBlueprint(BlueprintBase):
+    section_type: SectionType
+    page_width: int             # twips
+    page_height: int            # twips
+    orientation: PageOrientation
+    margin_header: int          # twips
+    margin_footer: int          # twips
+    margins: MarginsBlueprint
+
+
+class SectionBlueprint(BlueprintBase):
+    blocks: list[BlueprintBlock]
+    headers: HeaderFooterGroupBlueprint
+    footers: HeaderFooterGroupBlueprint
+    style: SectionStyleBlueprint

@@ -1,7 +1,7 @@
 from pydantic import BaseModel, ConfigDict
 
 
-class BlueprintNode(BaseModel):
+class BlueprintBase(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         frozen=True,

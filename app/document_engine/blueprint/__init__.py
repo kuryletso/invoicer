@@ -1,15 +1,21 @@
-from app.document_engine.blueprint.document import DocumentBlueprint
-from app.document_engine.blueprint.section import SectionBlueprint
-from app.document_engine.blueprint.paragraph import ParagraphBlueprint
-from app.document_engine.blueprint.table import TableBlueprint, RowBlueprint, CellBlueprint
-from app.document_engine.blueprint.segment import TextSegment, PlaceholderSegment, ImageSegment
+from app.document_engine.blueprint.models.template import TemplateBlueprint
+from app.document_engine.blueprint.models.section import SectionBlueprint
+from app.document_engine.blueprint.models.paragraph import ParagraphBlueprint
+from app.document_engine.blueprint.models.table import TableBlueprint, RowBlueprint, CellBlueprint
+from app.document_engine.blueprint.models.segment import (
+    TextSegment,
+    PlaceholderSegment,
+    PlaceholderJoinSegment,
+    PlaceholderGroupSegment,
+    ImageSegment,
+)
 
-from app.document_engine.blueprint.rebuild import rebuild_models
+from app.document_engine.blueprint.models.rebuild import rebuild_models
 
 rebuild_models()
 
 __all__ = [
-    "DocumentBlueprint",
+    "TemplateBlueprint",
     "SectionBlueprint",
     "ParagraphBlueprint",
     "TableBlueprint",
@@ -17,5 +23,7 @@ __all__ = [
     "CellBlueprint",
     "TextSegment",
     "PlaceholderSegment",
+    "PlaceholderJoinSegment",
+    "PlaceholderGroupSegment",
     "ImageSegment",
 ]
