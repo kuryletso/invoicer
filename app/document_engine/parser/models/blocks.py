@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 
 from app.document_engine.enums.enums import HeaderFooterType
@@ -16,7 +18,7 @@ class ParagraphNode:
 
 @dataclass(slots=True, frozen=True)
 class TableCellNode:
-    blocks: list[ParagraphNode]
+    blocks: list[ParagraphNode | TableNode]
     style: TableCellStyle
 
 @dataclass(slots=True, frozen=True)

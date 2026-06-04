@@ -23,7 +23,7 @@ from app.document_engine.normalization.style_defaults import (
     DEFAULT_TABLE_MARGINS,
 )
 
-from app.document_engine.parser.models.blocks import TableNode, TableRowStyle, TableCellStyle
+from app.document_engine.parser.models.blocks import ParagraphNode, TableNode, TableRowStyle, TableCellStyle
 from app.document_engine.parser.models.styles import TableBorderStyle
 
 from app.document_engine.enums.enums import TableWidthType, TableBorderStyleEnum, TableCellShading, VerticalAlignment
@@ -175,15 +175,21 @@ def normalize_table(table: TableNode) -> NormalizedTable:
 
     normalized_rows = []
     for row in table.rows:
-
         normalized_cells = []
 
         for cell in row.cells:
             normalized_blocks = []
+
             for block in cell.blocks:
-                normalized_blocks.append(
-                    normalize_paragraph(block)
-                )
+                if isinstance(block, ParagraphNode):
+                    normalized_blocks.append(
+                        normalize_paragraph(block),
+                    )
+
+                elif isinstance(block, TableNode):
+                    normalized_blocks.append(
+                        normalize_table(block),
+                    )
 
             normalized_cells.append(
                 NormalizedCell(

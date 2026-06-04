@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 
 from app.document_engine.normalization.models.inlines import NormalizedInlineNode
@@ -65,7 +67,7 @@ class NormalizedTableStyle:
 
 @dataclass(slots=True, frozen=True)
 class NormalizedCell:
-    blocks: tuple[NormalizedParagraph, ...]
+    blocks: tuple[NormalizedBlock, ...]
     style: NormalizedCellStyle
 
 
