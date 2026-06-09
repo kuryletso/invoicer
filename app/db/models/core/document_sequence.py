@@ -17,7 +17,7 @@ class DocumentSequence(Base):
     __table_args__ = (
         UniqueConstraint(
             "organization_id",
-            "document_type",
+            "document_type_code",
             "prefix",
             name="unique_organization_id_document_type_prefix"
         ),

@@ -7,7 +7,6 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship, attribute_keyed_dict
 
 from app.db.base import Base
-from app.db.models.references.language import Language
 from app.db.models.registries.measurement_unit import MeasurementUnitRegistry
 from app.domain.constants import MONEY, QUANTITY, RATE
 
@@ -32,7 +31,7 @@ class SnapInvoiceLine(Base):
         back_populates="invoice_lines",
     )
 
-    localizations: Mapped[dict[Language, SnapInvoiceLineLocalization]] = relationship(
+    localizations: Mapped[dict[str, SnapInvoiceLineLocalization]] = relationship(
         back_populates="invoice_line",
         collection_class=attribute_keyed_dict("language_code"),
         cascade="all, delete-orphan"

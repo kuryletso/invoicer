@@ -20,7 +20,7 @@ class Country(Base):
         primary_key=True,
     )
 
-    localizations: Mapped[dict[Language, CountryLocalization]] = relationship(
+    localizations: Mapped[dict[str, CountryLocalization]] = relationship(
         back_populates="country",
         collection_class=attribute_keyed_dict("language_code"),
         cascade="all, delete-orphan",

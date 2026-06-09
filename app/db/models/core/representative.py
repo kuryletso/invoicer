@@ -6,7 +6,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship, attribute_keyed_
 
 from app.db.base import Base
 from app.db.associations import organization_representative_m2m
-from app.db.models.references.language import Language
 
 if TYPE_CHECKING:
     from app.db.models.core.organization import Organization
@@ -23,7 +22,7 @@ class Representative(Base):
         back_populates="representatives",
     )
 
-    localizations: Mapped[dict[Language, RepresentativeLocalization]] = relationship(
+    localizations: Mapped[dict[str, RepresentativeLocalization]] = relationship(
         back_populates="representative",
         collection_class=attribute_keyed_dict("language_code"),
         cascade="all, delete-orphan",

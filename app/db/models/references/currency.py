@@ -6,7 +6,6 @@ from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship, attribute_keyed_dict
 
 from app.db.base import Base
-from app.db.models.references.language import Language
 
 if TYPE_CHECKING:
     from app.db.models.references.currency_localization import CurrencyLocalization
@@ -25,7 +24,7 @@ class Currency(Base):
         String(2),
     )
 
-    localizations: Mapped[dict[Language, CurrencyLocalization]] = relationship(
+    localizations: Mapped[dict[str, CurrencyLocalization]] = relationship(
         back_populates="currency",
         collection_class=attribute_keyed_dict("language_code"),
         cascade="all, delete-orphan",

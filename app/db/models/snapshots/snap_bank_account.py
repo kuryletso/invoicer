@@ -6,7 +6,6 @@ from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship, attribute_keyed_dict
 
 from app.db.base import Base
-from app.db.models.references.language import Language
 from app.db.models.references.currency import Currency
 
 if TYPE_CHECKING:
@@ -21,7 +20,7 @@ class SnapBankAccount(Base):
         primary_key=True,
     )
 
-    localizations: Mapped[dict[Language,SnapBankAccountLocalization]] = relationship(
+    localizations: Mapped[dict[str, SnapBankAccountLocalization]] = relationship(
         back_populates="bank_account",
         collection_class=attribute_keyed_dict("language_code"),
         cascade="all, delete-orphan",
@@ -47,5 +46,5 @@ class SnapBankAccount(Base):
 
     organization: Mapped[SnapOrganization] = relationship(
         foreign_keys=[organization_id],
-        back_populates="snap_bank_account",
+        back_populates="bank_account",
     )

@@ -7,7 +7,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship, attribute_keyed_
 
 from app.db.base import Base
 from app.db.models.core.organization_localization import OrganizationLocalization
-from app.db.models.references.language import Language
 from app.db.associations import organization_representative_m2m
 
 if TYPE_CHECKING:
@@ -30,7 +29,7 @@ class Organization(Base):
         String(16),
     )
 
-    localizations: Mapped[dict[Language, OrganizationLocalization]] = relationship(
+    localizations: Mapped[dict[str, OrganizationLocalization]] = relationship(
         back_populates="organization",
         collection_class=attribute_keyed_dict("language_code"),
         cascade="all, delete-orphan",

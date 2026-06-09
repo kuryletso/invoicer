@@ -6,7 +6,6 @@ from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship, attribute_keyed_dict
 
 from app.db.base import Base
-from app.db.models.references.language import Language
 
 if TYPE_CHECKING:
     from app.db.models.snapshots.snap_organization_localization import SnapOrganizationLocalization
@@ -19,7 +18,7 @@ class SnapOrganization(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
-    localizations: Mapped[dict[Language,SnapOrganizationLocalization]] = relationship(
+    localizations: Mapped[dict[str, SnapOrganizationLocalization]] = relationship(
         back_populates="organization",
         collection_class=attribute_keyed_dict("language_code"),
         cascade="all, delete-orphan",

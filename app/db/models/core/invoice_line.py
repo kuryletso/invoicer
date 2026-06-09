@@ -5,7 +5,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship, attribute_keyed_
 
 from app.db.base import Base
 from app.db.models.core.invoice_line_localization import InvoiceLineLocalization
-from app.db.models.references.language import Language
 from app.db.models.registries.measurement_unit import MeasurementUnitRegistry
 from app.domain.constants import MONEY, QUANTITY, RATE
 
@@ -15,7 +14,7 @@ class InvoiceLine(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     
-    localizations: Mapped[dict[Language,InvoiceLineLocalization]] = relationship(
+    localizations: Mapped[dict[str,InvoiceLineLocalization]] = relationship(
         back_populates="invoice_line",
         collection_class=attribute_keyed_dict("language_code"),
         cascade="all, delete-orphan",

@@ -26,7 +26,7 @@ class Snapshot(Base):
             "idx_issue_date_serial_document_type",
             "issue_date",
             "serial",
-            "document_type"
+            "document_type_code"
         ),
     )
 

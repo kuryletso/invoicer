@@ -29,13 +29,11 @@ class DefaultTemplateConfig(Base):
         foreign_keys=[secondary_language_code],
     )
 
-    type_id: Mapped[int] = mapped_column(
-        ForeignKey("document_types.id"),
+    document_type_code: Mapped[str] = mapped_column(
+        ForeignKey("document_type_registry.code"),
     )
 
-    type: Mapped[DocumentTypeRegistry] = relationship(
-        foreign_keys=[type_id],
-    )
+    document_type: Mapped[DocumentTypeRegistry] = relationship()
 
     name: Mapped[str] = mapped_column(
         String(255),
