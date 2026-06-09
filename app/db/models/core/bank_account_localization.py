@@ -6,11 +6,11 @@ from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
-from app.db.types import LanguageEnum
-from app.domain.enums import Language
+from app.db.models.references.language import Language
 
 if TYPE_CHECKING:
-    from app.db.models.bank_account import BankAccount
+    from app.db.models.core.bank_account import BankAccount
+
 
 class BankAccountLocalization(Base):
     __tablename__ = "bank_account_localizations"
@@ -20,15 +20,24 @@ class BankAccountLocalization(Base):
         primary_key=True,
     )
 
-    language: Mapped[Language] = mapped_column(
-        LanguageEnum,
+    language_code: Mapped[str] = mapped_column(
+        ForeignKey("languages.code"),
         primary_key=True,
     )
 
     bank_account: Mapped[BankAccount] = relationship(
+        foreign_keys=[bank_account_id],
         back_populates="localizations",
     )
 
-    bank_name: Mapped[str] = mapped_column(String(255))
+    language: Mapped[Language] = relationship(
+        foreign_keys=[language_code],
+    )
 
-    bank_info: Mapped[str] = mapped_column(String(255))
+    bank_name: Mapped[str] = mapped_column(
+        String(255),
+    )
+
+    bank_info: Mapped[str] = mapped_column(
+        String(255),
+    )

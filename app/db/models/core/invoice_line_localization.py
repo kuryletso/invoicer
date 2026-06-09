@@ -6,11 +6,11 @@ from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
-from app.db.types import LanguageEnum
-from app.domain.enums import Language
+from app.db.models.references.language import Language
 
 if TYPE_CHECKING:
-    from app.db.models.invoice_line import InvoiceLine
+    from app.db.models.core.invoice_line import InvoiceLine
+
 
 class InvoiceLineLocalization(Base):
     __tablename__ = "invoice_line_localizations"
@@ -20,15 +20,20 @@ class InvoiceLineLocalization(Base):
         primary_key=True,
     )
 
-    language: Mapped[Language] = mapped_column(
-        LanguageEnum,
+    language_code: Mapped[str] = mapped_column(
+        ForeignKey("languages.code"),
         primary_key=True,
     )
 
     invoice_line: Mapped[InvoiceLine] = relationship(
-        back_populates="localizations"
+        foreign_keys=[invoice_line_id],
+        back_populates="localizations",
+    )
+
+    language: Mapped[Language] = relationship(
+        foreign_keys=[language_code],
     )
 
     description: Mapped[str] = mapped_column(
-        String(255)
+        String(255),
     )

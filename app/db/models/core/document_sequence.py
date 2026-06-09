@@ -1,16 +1,16 @@
 from __future__ import annotations
 
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 from sqlalchemy import String, UniqueConstraint, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
-from app.db.types import DocumentTypeEnum
-from app.domain.enums import DocumentType
+from app.db.models.registries.document_type import DocumentTypeRegistry
 
 if TYPE_CHECKING:
-    from app.db.models.organization import Organization
+    from app.db.models.core.organization import Organization
+
 
 class DocumentSequence(Base):
     __tablename__ = "document_sequences"
@@ -23,25 +23,27 @@ class DocumentSequence(Base):
         ),
     )
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(
+        primary_key=True,
+    )
 
-    document_type: Mapped[DocumentType] = mapped_column(
-        DocumentTypeEnum,
-        nullable=False,
-    ) 
+    document_type_code: Mapped[str] = mapped_column(
+        ForeignKey("document_type_registry.code"),
+    )
+
+    document_type: Mapped[DocumentTypeRegistry] = relationship()
 
     organization_id: Mapped[int] = mapped_column(
         ForeignKey("organizations.id"),
-        nullable=False
     )
 
     organization: Mapped[Organization] = relationship(
+        foreign_keys=[organization_id],
         back_populates="sequences",
     )
 
-    prefix: Mapped[Optional[str]] = mapped_column(
+    prefix: Mapped[str | None] = mapped_column(
         String(32),
-        nullable=False,
         default="",
     )
 

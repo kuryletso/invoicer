@@ -1,34 +1,38 @@
+#
+# DEPRECATED
+# 
+
 from enum import StrEnum
 
 
-class Currency(StrEnum):
+class _Currency(StrEnum):
     USD = "USD"
     EUR = "EUR"
     UAH = "UAH"
 
 
-class Language(StrEnum):
+class _Language(StrEnum):
     ENG = "en"
     UKR = "uk"
 
 
-class MeasurementUnit(StrEnum):
+class _MeasurementUnit(StrEnum):
     ...
 
 
-class Country(StrEnum):
+class _Country(StrEnum):
     UKR = "ukr"
     USA = "usa"
 
 
-class TaxIdSystem(StrEnum):
+class _TaxIdSystem(StrEnum):
     VAT = "vat"
     EIN = "ein"
     EDRPOU = "edrpou"
     SSN = "ssn"
 
 
-class DocumentType(StrEnum):
+class _DocumentType(StrEnum):
     INVOICE = "invoice"
     ACT = "act"
     QUOTE = "quote"

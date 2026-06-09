@@ -15,29 +15,26 @@ class DefaultTemplateConfig(Base):
 
     primary_language_code: Mapped[str] = mapped_column(
         ForeignKey("languages.code"),
-        nullable=False,
     )
 
     primary_language: Mapped[Language] = relationship(
-        foreign_keys=[primary_language_code]
+        foreign_keys=[primary_language_code],
     )
 
-    secondary_language_code: Mapped[str] = mapped_column(
+    secondary_language_code: Mapped[str | None] = mapped_column(
         ForeignKey("languages.code"),
-        nullable=True,
     )
 
-    secondary_language: Mapped[Language] = relationship(
-        foreign_keys=[secondary_language_code]
+    secondary_language: Mapped[Language | None] = relationship(
+        foreign_keys=[secondary_language_code],
     )
 
     type_id: Mapped[int] = mapped_column(
         ForeignKey("document_types.id"),
-        nullable=False,
     )
 
     type: Mapped[DocumentTypeRegistry] = relationship(
-        foreign_keys=[type_id]
+        foreign_keys=[type_id],
     )
 
     name: Mapped[str] = mapped_column(

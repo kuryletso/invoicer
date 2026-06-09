@@ -3,8 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from sqlalchemy import String
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.orm.collections import attribute_mapped_collection
+from sqlalchemy.orm import Mapped, mapped_column, relationship, attribute_keyed_dict
 
 from app.db.base import Base
 from app.db.models.references.language import Language
@@ -21,8 +20,8 @@ class DocumentTypeRegistry(Base):
         primary_key=True,
     )
 
-    localization: Mapped[dict[Language, DocumentTypeRegistryLocalization]] = relationship(
+    localizations: Mapped[dict[Language, DocumentTypeRegistryLocalization]] = relationship(
         back_populates="document_type",
-        collection_class=attribute_mapped_collection("language_code"),
+        collection_class=attribute_keyed_dict("language_code"),
         cascade="all, delete-orphan",
     )

@@ -6,11 +6,11 @@ from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
-from app.db.types import LanguageEnum
-from app.domain.enums import Language
+from app.db.models.references.language import Language
 
 if TYPE_CHECKING:
-    from app.db.models.representative import Representative
+    from app.db.models.core.representative import Representative
+
 
 class RepresentativeLocalization(Base):
     __tablename__ = "representative_localizations"
@@ -20,15 +20,24 @@ class RepresentativeLocalization(Base):
         primary_key=True,
     )
 
-    language: Mapped[Language] = mapped_column(
-        LanguageEnum,
+    language_code: Mapped[str] = mapped_column(
+        ForeignKey("languages.code"),
         primary_key=True,
     )
 
     representative: Mapped[Representative] = relationship(
         back_populates="localizations",
+        foreign_keys=[representative_id],
     )
 
-    name: Mapped[str] = mapped_column(String(255))
+    language: Mapped[Language] = relationship(
+        foreign_keys=[language_code],
+    )
 
-    title: Mapped[str] = mapped_column(String(150))
+    name: Mapped[str] = mapped_column(
+        String(255),
+    )
+
+    title: Mapped[str] = mapped_column(
+        String(150),
+    )

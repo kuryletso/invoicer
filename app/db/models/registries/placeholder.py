@@ -14,14 +14,12 @@ class PlaceholderRegistry(Base):
 
     required: Mapped[bool]
 
-    label: Mapped[str] = mapped_column(
+    label: Mapped[str | None] = mapped_column(
         String(30),
-        nullable=True,
     )
 
-    description: Mapped[str] = mapped_column(
+    description: Mapped[str | None] = mapped_column(
         String(120),
-        nullable=True,
     )
 
     active: Mapped[bool]

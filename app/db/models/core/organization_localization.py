@@ -1,14 +1,14 @@
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
-from app.db.types import LanguageEnum
-from app.domain.enums import Language
+from app.db.models.references.language import Language
 
 if TYPE_CHECKING:
-    from app.db.models.organization import Organization
+    from app.db.models.core.organization import Organization
+
 
 class OrganizationLocalization(Base):
     __tablename__ = "organization_localizations"
@@ -18,18 +18,24 @@ class OrganizationLocalization(Base):
         primary_key=True,
     )
 
-    language: Mapped[Language] = mapped_column(
-        LanguageEnum,
+    language_code: Mapped[str] = mapped_column(
+        ForeignKey("languages.code"),
         primary_key=True,
     )
 
     organization: Mapped[Organization] = relationship(
+        foreign_keys=[organization_id],
         back_populates="localizations",
     )
 
-    legal_name: Mapped[str] = mapped_column(String(255))
+    language: Mapped[Language] = relationship(
+        foreign_keys=[language_code],
+    )
 
-    address: Mapped[Optional[str]] = mapped_column(
+    legal_name: Mapped[str] = mapped_column(
         String(255),
-        nullable=True
+    )
+
+    address: Mapped[str | None] = mapped_column(
+        String(255),
     )

@@ -3,8 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from sqlalchemy import String
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.orm.collections import attribute_mapped_collection
+from sqlalchemy.orm import Mapped, mapped_column, relationship, attribute_keyed_dict
 
 from app.db.base import Base
 from app.db.models.references.language import Language
@@ -23,6 +22,6 @@ class MeasurementUnitRegistry(Base):
 
     localizations: Mapped[dict[Language, MeasurementUnitRegistryLocalization]] = relationship(
         back_populates="measurement_unit",
-        collection_class=attribute_mapped_collection("language_code"),
+        collection_class=attribute_keyed_dict("language_code"),
         cascade="all, delete-orphan",
     )

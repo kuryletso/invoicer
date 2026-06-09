@@ -6,6 +6,7 @@ from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
+from app.db.models.references.language import Language
 
 if TYPE_CHECKING:
     from app.db.models.registries.measurement_unit import MeasurementUnitRegistry
@@ -25,7 +26,12 @@ class MeasurementUnitRegistryLocalization(Base):
     )
 
     measurement_unit: Mapped[MeasurementUnitRegistry] = relationship(
+        foreign_keys=[measurement_unit_code],
         back_populates="localizations",
+    )
+
+    language: Mapped[Language] = relationship(
+        foreign_keys=[language_code],
     )
 
     name: Mapped[str] = mapped_column(
