@@ -6,6 +6,15 @@ class PlaceholderDefinition(BlueprintBase):
     required: bool = False
 
 
+class TemplateConfig(BlueprintBase):
+    primary_language: str
+    secondary_language: str | None
+    type: str
+    name: str
+    description: str
+
+
 class TemplateBlueprint(BlueprintBase):
     sections: tuple[SectionBlueprint, ...]
     placeholders: dict[str, PlaceholderDefinition]
+    config: TemplateConfig

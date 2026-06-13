@@ -21,6 +21,7 @@ class TextSegment(BlueprintBase):
 class PlaceholderSegment(BlueprintBase):
     type: Literal["placeholder"] = "placeholder"
     key: str
+    language: str
     style: TextStyleBlueprint
 
 

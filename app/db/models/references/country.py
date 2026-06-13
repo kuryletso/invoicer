@@ -6,7 +6,6 @@ from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship, attribute_keyed_dict
 
 from app.db.base import Base
-from app.db.models.references.language import Language
 
 if TYPE_CHECKING:
     from app.db.models.references.country_localization import CountryLocalization
