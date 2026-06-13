@@ -23,14 +23,14 @@ def paragraph_style_bp_from_normalized(
 
 def paragraph_bp_from_normalized(
     paragraph: NormalizedParagraph,
-    template_builder_context: TemplateBuilderContext,
+    context: TemplateBuilderContext,
 ) -> ParagraphBlueprint:
     
     segments = []
     for inline in paragraph.inlines:
         if isinstance(inline, NormalizedTextNode):
             segments.extend(
-                extract_segments(inline, template_builder_context),
+                extract_segments(inline, context),
             )
 
         elif isinstance(inline, NormalizedImageNode):

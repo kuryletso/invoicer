@@ -53,13 +53,19 @@ class TemplateBuilderContext:
     placeholders: dict[str, dict]
 
 
-    def _register_placeholder(
+    def register_placeholder(
         self,
         key: str,
     ) -> None:
         
         if key in self.placeholder_defaults:
+            if not self.placeholder_defaults[key].get("active", False):
+                raise PlaceholderSyntaxError(
+                    f"Placeholder key '{key}' is disabled."
+                )
+
             self.placeholders.setdefault(key, self.placeholder_defaults[key])
+
         else:
             raise PlaceholderSyntaxError(
                 f"Not registed key in placeholder: {key}."
@@ -69,7 +75,7 @@ class TemplateBuilderContext:
 @dataclass(slots=True)
 class TemplateDraft:
     sections: list[SectionBlueprint]
-    placeholders: dict[str, dict]
+    context: TemplateBuilderContext
     config: TemplateDraftConfig
 
 
@@ -82,15 +88,10 @@ class TemplateBuilder:
         placeholder_defaults: dict[str, dict[str, Any]],      # request from placeholders registry table
         languages: set[str],        # request from languages reference table
     ) -> TemplateDraft:
-        
-        # self._placeholder_defaults = placeholder_defaults
-        # self._languages = languages
-
-        # self._placeholders: dict[str, bool] = {}
 
         config = TemplateDraftConfig.from_template_config(default_config)
 
-        self._context = TemplateBuilderContext(
+        context = TemplateBuilderContext(
             default_language=config.primary_language,
             placeholder_defaults=placeholder_defaults,
             languages=languages,
@@ -98,28 +99,15 @@ class TemplateBuilder:
         )
 
         sections = [
-            section_bp_from_normalized(section, self._context)
+            section_bp_from_normalized(section, context)
             for section in normalized
         ]
 
         return TemplateDraft(
             sections=sections,
-            placeholders=self._context.placeholders,
+            context=context,
             config=config,
         )
-    
-    # def _register_placeholder(
-    #     self,
-    #     key: str,
-    # ) -> None:
-        
-    #     if key in self._placeholder_defaults:
-    #         self._placeholders.setdefault(key, self._placeholder_defaults[key])
-    #     else:
-    #         raise PlaceholderSyntaxError(
-    #             f"Not registed key in placeholder: {key}."
-    #         )
-
 
     def _define_placeholders(
         self,
@@ -139,6 +127,6 @@ class TemplateBuilder:
         
         return TemplateBlueprint(
             sections=tuple(draft.sections),
-            placeholders=self._define_placeholders(draft.placeholders),
+            placeholders=self._define_placeholders(draft.context.placeholders),
             config=draft.config.to_template_config(),
         )

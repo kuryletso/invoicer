@@ -3,7 +3,7 @@ from app.document_engine.blueprint.models.section import SectionBlueprint
 
 
 class PlaceholderDefinition(BlueprintBase):
-    required: bool = False
+    required: bool = True
 
 
 class TemplateConfig(BlueprintBase):

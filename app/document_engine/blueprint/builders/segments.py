@@ -41,7 +41,7 @@ def split_placeholder_key(
     key: str,
 ) -> tuple[str, str | None]:
     
-    parts = key.split()
+    parts = key.split(".")
 
     if len(parts) == 1:
         return key, None
@@ -102,11 +102,12 @@ def _parse_grouped(
         if t.kind == TK.IDENT:
             if in_group:
                 base, language = split_placeholder_key(t.value)
+                language = language or context.default_language
                 if language not in context.languages:
                     raise PlaceholderSyntaxError(
                         f"Invalid placeholder key '{t.value}': invalid language."
                     )
-                context._register_placeholder(base)
+                context.register_placeholder(base)
                 
                 curr_group.append(
                     PlaceholderSegment(
@@ -197,11 +198,12 @@ def _parse_joined(
                     )
             else:
                 base, language = split_placeholder_key(t.value)
+                language = language or context.default_language
                 if language not in context.languages:
                     raise PlaceholderSyntaxError(
                         f"Invalid placeholder key '{t.value}': invalid language."
                     )
-                context._register_placeholder(base)
+                context.register_placeholder(base)
                 items.append(
                     PlaceholderSegment(
                         type="placeholder",
@@ -247,11 +249,12 @@ def _parse_simple(
     t = tokens[0]
     if t.kind == TK.IDENT:
         base, language = split_placeholder_key(t.value)
+        language = language or context.default_language
         if language not in context.languages:
             raise PlaceholderSyntaxError(
                 f"Invalid placeholder key '{t.value}': invalid language."
             )
-        context._register_placeholder(base)
+        context.register_placeholder(base)
 
         return PlaceholderSegment(
             type="placeholder",
