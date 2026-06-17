@@ -4,8 +4,14 @@ from typing import TYPE_CHECKING, Literal
 
 from app.document_engine.blueprint.models.blueprint_base import BlueprintBase
 from app.document_engine.blueprint.models.margins import MarginsBlueprint
+from app.document_engine.blueprint.models.segment import TextStyleBlueprint
 
-from app.document_engine.enums.enums import TableCellShading, VerticalAlignment, TableWidthType, TableBorderStyleEnum
+from app.document_engine.enums.enums import (
+    TableCellShading,
+    VerticalAlignment,
+    TableWidthType,
+    TableBorderStyleEnum
+)
 
 if TYPE_CHECKING:
     from app.document_engine.blueprint.models.unions import BlueprintBlock
@@ -52,12 +58,29 @@ class CellBlueprint(BlueprintBase):
     style: CellStyleBlueprint
 
 
+class CellPlaceholder(BlueprintBase):
+    key: str
+    language: str
+    cell_style: CellStyleBlueprint
+    text_style: TextStyleBlueprint
+
+
 class RowBlueprint(BlueprintBase):
     cells: tuple[CellBlueprint, ...]
     style: RowStyleBlueprint
 
 
+class RowPlaceholder(BlueprintBase):
+    cells: tuple[CellBlueprint | CellPlaceholder, ...]
+    style: RowStyleBlueprint
+
+
 class TableBlueprint(BlueprintBase):
     type: Literal["table"] = "table"
-    rows: tuple[RowBlueprint, ...]
+    rows: tuple[RowBlueprint | RowPlaceholder, ...]
+    style: TableStyleBlueprint
+
+
+class TablePlaceholder(BlueprintBase):
+    type: Literal["placeholder_table"] = "placeholder_table"
     style: TableStyleBlueprint

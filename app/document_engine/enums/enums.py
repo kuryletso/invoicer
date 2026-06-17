@@ -66,3 +66,9 @@ class TableWidthType(StrEnum):
     AUTO = "auto"
     DXA = "dxa"
     PCT = "pct"
+
+
+class PlaceholderType(StrEnum):
+    SCALAR = "scalar"
+    TABLE = "table"
+    COLUMN = "column"

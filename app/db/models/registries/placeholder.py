@@ -1,7 +1,9 @@
-from sqlalchemy import String
+from sqlalchemy import String, JSON, Enum as SQLEnum
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
+
+from app.document_engine.enums.enums import PlaceholderType
 
 
 class PlaceholderRegistry(Base):
@@ -14,6 +16,10 @@ class PlaceholderRegistry(Base):
 
     required: Mapped[bool]
 
+    type: Mapped[PlaceholderType] = mapped_column(
+        SQLEnum(PlaceholderType),
+    )
+
     label: Mapped[str | None] = mapped_column(
         String(30),
     )
@@ -23,3 +29,7 @@ class PlaceholderRegistry(Base):
     )
 
     active: Mapped[bool]
+
+    columns: Mapped[list[str] | None] = mapped_column(
+        JSON,
+    )

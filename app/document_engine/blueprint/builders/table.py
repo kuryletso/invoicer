@@ -3,16 +3,22 @@ from __future__ import annotations
 from app.document_engine.blueprint.template_builder import TemplateBuilderContext
 from app.document_engine.blueprint.builders.margins import margins_bp_from_normalized
 from app.document_engine.blueprint.builders.paragraph import paragraph_bp_from_normalized
+from app.document_engine.blueprint.models.paragraph import ParagraphBlueprint
+from app.document_engine.blueprint.models.segment import PlaceholderSegment
 from app.document_engine.blueprint.models.table import (
     TableBlueprint,
+    TablePlaceholder,
     RowBlueprint,
+    RowPlaceholder,
     CellBlueprint,
+    CellPlaceholder,
     TableStyleBlueprint,
     RowStyleBlueprint,
     CellStyleBlueprint,
     TableWidthBlueprint,
-    TableBorderBlueprint
+    TableBorderBlueprint,
 )
+from app.document_engine.blueprint.errors import BlueprintBuilderError
 
 from app.document_engine.normalization.models.blocks import (
     NormalizedTable,
@@ -141,10 +147,79 @@ def table_style_bp_from_normalized(
     )
 
 
+def _promote_placeholder_rows(
+    table: TableBlueprint,
+) -> TableBlueprint | TablePlaceholder:
+     
+    new_rows = []
+    replace_table = False
+
+    for row in table.rows:
+
+        if replace_table:
+            break
+
+        placeholder_cells = {}
+
+        for i, cell in enumerate(row.cells):
+
+            if replace_table:
+                break
+
+            if isinstance(cell, CellPlaceholder):
+                raise BlueprintBuilderError(
+                    "Table's placeholder rows are already promoted."
+                )
+            
+            else:
+                for block in cell.blocks:
+
+                    if replace_table:
+                        break
+
+                    if isinstance(block, ParagraphBlueprint):
+                        for seg in block.segments:
+                            if isinstance(seg, PlaceholderSegment):
+                                if seg.key == "invoice_table":
+                                    replace_table = True
+                                    break
+                                elif seg.key.startswith(("invl_", "invt_")):
+                                    placeholder_cells[i] = CellPlaceholder(
+                                        key=seg.key,
+                                        language=seg.language,
+                                        cell_style=cell.style,
+                                        text_style=seg.style,
+                                    )
+
+        if placeholder_cells:
+            new_cells = [
+                cell if i not in placeholder_cells.keys()
+                else placeholder_cells[i]
+                for i, cell in enumerate(row.cells)
+            ]
+            new_rows.append(
+                RowPlaceholder(
+                    cells=tuple(new_cells),
+                    style=row.style,
+                )
+            )
+        else:
+            new_rows.append(row)
+
+    if replace_table:
+        return TablePlaceholder(
+            type="placeholder_table",
+            style=table.style,
+        )
+    
+    else:
+        return table.model_copy(update={"rows": tuple(new_rows)})
+
+
 def table_bp_from_normalized(
     normalized: NormalizedTable,
     context: TemplateBuilderContext,
-) -> TableBlueprint:
+) -> TableBlueprint | TablePlaceholder:
     
     style = table_style_bp_from_normalized(normalized.style)
 
@@ -157,8 +232,10 @@ def table_bp_from_normalized(
             )
         )
 
-    return TableBlueprint(
+    table = TableBlueprint(
         type="table",
         rows=tuple(rows),
         style=style,
     )
+
+    return _promote_placeholder_rows(table)

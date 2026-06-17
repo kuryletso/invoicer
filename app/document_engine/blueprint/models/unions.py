@@ -6,7 +6,7 @@ from pydantic import Field
 
 if TYPE_CHECKING:
     from app.document_engine.blueprint.models.paragraph import ParagraphBlueprint
-    from app.document_engine.blueprint.models.table import TableBlueprint
+    from app.document_engine.blueprint.models.table import TableBlueprint, TablePlaceholder
     from app.document_engine.blueprint.models.segment import (
         TextSegment,
         PlaceholderSegment,
@@ -28,6 +28,7 @@ BlueprintSegment = Annotated[
 
 BlueprintBlock = Annotated[
     ParagraphBlueprint
-    | TableBlueprint,
+    | TableBlueprint
+    | TablePlaceholder,
     Field(discriminator="type")
 ]
