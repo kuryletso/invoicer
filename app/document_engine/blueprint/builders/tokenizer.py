@@ -59,6 +59,10 @@ def tokenize_placeholder(
                 else:
                     buf.append(c)
                     i += 1
+            else:
+                raise PlaceholderSyntaxError(
+                    f"Missing closing quote [{q}] in placeholder: {content}."
+                )
 
             tokens.append(Token(TK.STRING, "".join(buf)))
 

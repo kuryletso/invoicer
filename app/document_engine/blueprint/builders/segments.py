@@ -91,7 +91,7 @@ def _parse_grouped(
             else:
                 in_group = True
 
-        if t.kind == TK.RPAREN:
+        elif t.kind == TK.RPAREN:
             if in_group:
                 groups.append(tuple(curr_group))
                 curr_group.clear()
@@ -99,7 +99,7 @@ def _parse_grouped(
             else:
                 pass
 
-        if t.kind == TK.IDENT:
+        elif t.kind == TK.IDENT:
             if in_group:
                 base, language = split_placeholder_key(t.value)
                 language = language or context.default_language
@@ -133,7 +133,7 @@ def _parse_grouped(
                     f"Ungrouped key {t.value} in grouped placeholder."
                 )
             
-        if t.kind == TK.STRING:
+        elif t.kind == TK.STRING:
             if in_group:
                 curr_group.append(
                     TextSegment(
@@ -147,10 +147,10 @@ def _parse_grouped(
                     f"Ungrouped text literal {t.value} in grouped placeholder."
                 )
             
-        if t.kind == TK.COMMA:
+        elif t.kind == TK.COMMA:
             pass
 
-        if t.kind == TK.EQ:
+        elif t.kind == TK.EQ:
             raise PlaceholderSyntaxError(
                 "Unexpected '=' in grouped placeholder."
             )
@@ -194,7 +194,7 @@ def _parse_joined(
                     i += 2
                 else:
                     raise PlaceholderSyntaxError(
-                        "Invalid separator syntax in grouped placeholder."
+                        "Invalid separator syntax in joined placeholder."
                     )
             else:
                 base, language = split_placeholder_key(t.value)

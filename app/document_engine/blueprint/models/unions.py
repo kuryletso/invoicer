@@ -1,19 +1,23 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING, Annotated
+from typing import Annotated
 
 from pydantic import Field
 
-if TYPE_CHECKING:
-    from app.document_engine.blueprint.models.paragraph import ParagraphBlueprint
-    from app.document_engine.blueprint.models.table import TableBlueprint, TablePlaceholder
-    from app.document_engine.blueprint.models.segment import (
-        TextSegment,
-        PlaceholderSegment,
-        JoinedPlaceholderSegment,
-        GroupedPlaceholderSegment,
-        ImageSegment,
-    )
+from app.document_engine.blueprint.models.paragraph import ParagraphBlueprint
+from app.document_engine.blueprint.models.segment import (
+    TextSegment,
+    PlaceholderSegment,
+    JoinedPlaceholderSegment,
+    GroupedPlaceholderSegment,
+    ImageSegment,
+)
+from app.document_engine.blueprint.models.table import (
+    TableBlueprint,
+    TablePlaceholder,
+    RowBlueprint,
+    RowPlaceholder,
+    CellBlueprint,
+    CellPlaceholder,
+)
 
 
 BlueprintSegment = Annotated[
@@ -22,7 +26,21 @@ BlueprintSegment = Annotated[
     | JoinedPlaceholderSegment
     | GroupedPlaceholderSegment
     | ImageSegment,
-    Field(discriminator="type")
+    Field(discriminator="type"),
+]
+
+
+BlueprintCell = Annotated[
+    CellBlueprint
+    | CellPlaceholder,
+    Field(discriminator="type"),
+]
+
+
+BlueprintRow = Annotated[
+    RowBlueprint
+    | RowPlaceholder,
+    Field(discriminator="type"),
 ]
 
 
@@ -30,5 +48,5 @@ BlueprintBlock = Annotated[
     ParagraphBlueprint
     | TableBlueprint
     | TablePlaceholder,
-    Field(discriminator="type")
+    Field(discriminator="type"),
 ]

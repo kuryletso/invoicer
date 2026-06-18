@@ -1,7 +1,15 @@
 from app.document_engine.blueprint.models.template import TemplateBlueprint
 from app.document_engine.blueprint.models.section import SectionBlueprint
+from app.document_engine.blueprint.models.header_footer import HeaderFooterBlueprint, HeaderFooterGroupBlueprint
 from app.document_engine.blueprint.models.paragraph import ParagraphBlueprint
-from app.document_engine.blueprint.models.table import TableBlueprint, RowBlueprint, CellBlueprint
+from app.document_engine.blueprint.models.table import (
+    TableBlueprint,
+    TablePlaceholder,
+    RowBlueprint,
+    RowPlaceholder,
+    CellBlueprint,
+    CellPlaceholder,
+)
 from app.document_engine.blueprint.models.segment import (
     TextSegment,
     PlaceholderSegment,
@@ -17,10 +25,15 @@ rebuild_models()
 __all__ = [
     "TemplateBlueprint",
     "SectionBlueprint",
+    "HeaderFooterBlueprint",
+    "HeaderFooterGroupBlueprint",
     "ParagraphBlueprint",
     "TableBlueprint",
+    "TablePlaceholder",
     "RowBlueprint",
+    "RowPlaceholder",
     "CellBlueprint",
+    "CellPlaceholder",
     "TextSegment",
     "PlaceholderSegment",
     "JoinedPlaceholderSegment",

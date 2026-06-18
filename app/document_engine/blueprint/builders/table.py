@@ -18,7 +18,7 @@ from app.document_engine.blueprint.models.table import (
     TableWidthBlueprint,
     TableBorderBlueprint,
 )
-from app.document_engine.blueprint.errors import BlueprintBuilderError
+from app.document_engine.blueprint.errors import BlueprintBuilderError, PlaceholderSyntaxError
 
 from app.document_engine.normalization.models.blocks import (
     NormalizedTable,
@@ -170,7 +170,7 @@ def _promote_placeholder_rows(
                 raise BlueprintBuilderError(
                     "Table's placeholder rows are already promoted."
                 )
-            
+
             else:
                 for block in cell.blocks:
 
@@ -183,7 +183,14 @@ def _promote_placeholder_rows(
                                 if seg.key == "invoice_table":
                                     replace_table = True
                                     break
-                                elif seg.key.startswith(("invl_", "invt_")):
+
+                                elif seg.key.startswith("invl_"):
+                                    
+                                    if i in placeholder_cells:
+                                        raise PlaceholderSyntaxError(
+                                            "Only one invoice line placeholder per cell is supported."
+                                        )
+                                    
                                     placeholder_cells[i] = CellPlaceholder(
                                         key=seg.key,
                                         language=seg.language,

@@ -68,7 +68,7 @@ class TemplateBuilderContext:
 
         else:
             raise PlaceholderSyntaxError(
-                f"Not registed key in placeholder: {key}."
+                f"Not registered key in placeholder: {key}."
             )
         
 

@@ -1,9 +1,13 @@
-from typing import Literal
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Literal
 
 from app.document_engine.blueprint.models.blueprint_base import BlueprintBase
-from app.document_engine.blueprint.models.unions import BlueprintSegment
 
 from app.document_engine.enums.enums import ParagraphAlignment
+
+if TYPE_CHECKING:
+    from app.document_engine.blueprint.models.unions import BlueprintSegment
 
 
 class ParagraphStyleBlueprint(BlueprintBase):

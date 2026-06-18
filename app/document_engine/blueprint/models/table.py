@@ -14,7 +14,11 @@ from app.document_engine.enums.enums import (
 )
 
 if TYPE_CHECKING:
-    from app.document_engine.blueprint.models.unions import BlueprintBlock
+    from app.document_engine.blueprint.models.unions import (
+        BlueprintBlock,
+        BlueprintRow,
+        BlueprintCell,
+    )
 
 
 class CellStyleBlueprint(BlueprintBase):
@@ -54,11 +58,13 @@ class TableStyleBlueprint(BlueprintBase):
 
 
 class CellBlueprint(BlueprintBase):
+    type: Literal["cell"] = "cell"
     blocks: tuple[BlueprintBlock, ...]
     style: CellStyleBlueprint
 
 
 class CellPlaceholder(BlueprintBase):
+    type: Literal["placeholder_cell"] = "placeholder_cell"
     key: str
     language: str
     cell_style: CellStyleBlueprint
@@ -66,18 +72,20 @@ class CellPlaceholder(BlueprintBase):
 
 
 class RowBlueprint(BlueprintBase):
-    cells: tuple[CellBlueprint, ...]
+    type: Literal["row"] = "row"
+    cells: tuple[BlueprintCell, ...]
     style: RowStyleBlueprint
 
 
 class RowPlaceholder(BlueprintBase):
-    cells: tuple[CellBlueprint | CellPlaceholder, ...]
+    type: Literal["placeholder_row"] = "placeholder_row"
+    cells: tuple[BlueprintCell, ...]
     style: RowStyleBlueprint
 
 
 class TableBlueprint(BlueprintBase):
     type: Literal["table"] = "table"
-    rows: tuple[RowBlueprint | RowPlaceholder, ...]
+    rows: tuple[BlueprintRow, ...]
     style: TableStyleBlueprint
 
 
