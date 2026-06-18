@@ -3,6 +3,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 from dataclasses import dataclass
 
+from app.core.diagnostics import DiagnosticCollector
+
 from app.document_engine.blueprint.models.template import TemplateBlueprint, PlaceholderDefinition, TemplateConfig
 from app.document_engine.blueprint.models.section import SectionBlueprint
 from app.document_engine.blueprint.errors import PlaceholderSyntaxError
@@ -51,6 +53,7 @@ class TemplateBuilderContext:
     placeholder_defaults: dict[str, dict[str, Any]]
     languages: set[str]
     placeholders: dict[str, dict]
+    diagnostics: DiagnosticCollector
 
 
     def register_placeholder(
@@ -87,6 +90,7 @@ class TemplateBuilder:
         default_config: TemplateConfig,
         placeholder_defaults: dict[str, dict[str, Any]],      # request from placeholders registry table
         languages: set[str],        # request from languages reference table
+        diagnostics: DiagnosticCollector,
     ) -> TemplateDraft:
 
         config = TemplateDraftConfig.from_template_config(default_config)
@@ -96,6 +100,7 @@ class TemplateBuilder:
             placeholder_defaults=placeholder_defaults,
             languages=languages,
             placeholders={},
+            diagnostics=diagnostics,
         )
 
         sections = [

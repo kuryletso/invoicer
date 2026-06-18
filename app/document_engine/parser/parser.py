@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from app.assets.service import AssetService
+from app.core.diagnostics import DiagnosticCollector
 from app.document_engine.parser.archive import DocxArchive, DocxPaths
 from app.document_engine.parser.context import ParserContext
 from app.document_engine.parser.models.blocks import ParagraphNode, TableNode, SectionBreakNode
@@ -18,7 +19,11 @@ type ParsedBlock = ParagraphNode | TableNode | SectionBreakNode
 
 
 class DocxParser:
-    def __init__(self, path: Path) -> None:
+    def __init__(
+            self,
+            path: Path,
+            diagnostics: DiagnosticCollector,
+        ) -> None:
         self.archive = DocxArchive(path)
         self.document_root = self.archive.read_xml(DocxPaths.document)
         self.styles_root = self.archive.read_xml(DocxPaths.styles)
@@ -32,6 +37,7 @@ class DocxParser:
             relationships=self.relationships,
             asset_service=AssetService(),
             style_resolver=StyleResolver(self.styles, self.doc_defaults),
+            diagnostics=diagnostics,
         )
 
     def __enter__(self): return self

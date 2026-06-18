@@ -1,3 +1,5 @@
+from app.core.diagnostics import DiagnosticCollector
+
 from app.document_engine.normalization.models.blocks import NormalizedBlock
 from app.document_engine.normalization.models.sections import NormalizedSection
 from app.document_engine.normalization.normalizers.paragraphs import normalize_paragraph
@@ -14,7 +16,8 @@ class StructuralNormalizer:
     @classmethod
     def normalize(
             cls,
-            parsed_blocks: list[ParagraphNode | TableNode | SectionBreakNode]
+            parsed_blocks: list[ParagraphNode | TableNode | SectionBreakNode],
+            diagnostics: DiagnosticCollector,
         ) -> list[NormalizedSection]:
 
         if not parsed_blocks:

@@ -1,3 +1,5 @@
+from app.core.errors import Layer, AppError
+
 from app.document_engine.blueprint.template_builder import TemplateBuilderContext
 from app.document_engine.blueprint.models.segment import (
     ImageSegment,
@@ -364,13 +366,28 @@ def extract_segments(
                     )
                 )
 
-            segments.append(
-                parse_placeholder(
-                    content=text[start:end],
-                    style=style,
-                    context=context,
+            try:
+                segments.append(
+                    parse_placeholder(
+                        content=text[start:end],
+                        style=style,
+                        context=context,
+                    )
                 )
-            )
+            except PlaceholderSyntaxError as e:     # WARNING
+                context.diagnostics.warn(
+                    Layer.BLUEPRINT,
+                    e.code,
+                    str(e),
+                    content=text[start:end]
+                )
+                segments.append(
+                    TextSegment(
+                        type="text",
+                        text=text[start:end],
+                        style=style,
+                    )
+                )
 
             last = end
 
