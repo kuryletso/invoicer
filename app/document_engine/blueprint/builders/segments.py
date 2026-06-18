@@ -1,4 +1,4 @@
-from app.core.errors import Layer, AppError
+from app.core.errors import Layer
 
 from app.document_engine.blueprint.template_builder import TemplateBuilderContext
 from app.document_engine.blueprint.models.segment import (
@@ -348,10 +348,13 @@ def extract_segments(
             i += 1
 
     if in_placeholder:
-        raise PlaceholderSyntaxError(
-            f"Broken placeholder at index [{start}] in text: {text}."
+        context.diagnostics.warn(
+            Layer.BLUEPRINT,
+            "unclosed_placeholder",
+            f"Unclosed placeholder at index [{start}]; treated as literal text.",
+            content=text[start:],
         )
-    
+
     if placeholder_index:
         last = 0
 

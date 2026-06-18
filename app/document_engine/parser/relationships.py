@@ -57,8 +57,16 @@ class RelationshipResolver:
             raise ParserSecurityError(
                 f"Invalid relationship path: {target}."
             )
-        if ".." in path.parts:
-            raise ParserSecurityError(
-                f"Invalid relationship path: {target}."
-            )
-        return str(PACKAGE_ROOT / path)
+
+        resolved: list[str] = []
+        for part in (PACKAGE_ROOT / path).parts:
+            if part == "..":
+                if not resolved:
+                    raise ParserSecurityError(
+                        f"Invalid relationship path: {target}."
+                    )
+                resolved.pop()
+            else:
+                resolved.append(part)
+
+        return str(PurePosixPath(*resolved))

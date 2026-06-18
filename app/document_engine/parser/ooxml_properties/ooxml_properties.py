@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(frozen=True)
 class OOXMLRunAttributeNames:
     properties: str = "w:rPr"
     bold: str = "w:b"
@@ -12,7 +12,7 @@ class OOXMLRunAttributeNames:
     color: str = "w:color"
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(frozen=True)
 class OOXMLParagraphAttributeNames:
     properties: str = "w:pPr"
     alignment: str = "w:jc"
@@ -21,7 +21,7 @@ class OOXMLParagraphAttributeNames:
     keep_next: str = "w:keepNext"
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(frozen=True)
 class OOXMLTableCellAttributeNames:
     shading: str = "w:shd"
     margins: str = "w:tcMar"
@@ -29,13 +29,13 @@ class OOXMLTableCellAttributeNames:
     v_alignment: str = "w:vAlign"
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(frozen=True)
 class OOXMLTableRowAttributeNames:
     height: str = "w:trHeight"
     header: str = "w:tblHeader"
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(frozen=True)
 class OOXMLTableAttributeNames:
     properties: str = "w:tblPr"
     width: str = "w:tblW"
@@ -44,7 +44,7 @@ class OOXMLTableAttributeNames:
     margins: str = "w:tblCellMar"
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(frozen=True)
 class OOXMLStyleAttributeNames:
     style: str = "w:style"
     name: str = "w:name"

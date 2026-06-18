@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 from dataclasses import dataclass
 
 from app.core.diagnostics import DiagnosticCollector
@@ -10,10 +10,6 @@ from app.document_engine.blueprint.models.section import SectionBlueprint
 from app.document_engine.blueprint.errors import PlaceholderSyntaxError
 
 from app.document_engine.normalization.models.sections import NormalizedSection
-
-if TYPE_CHECKING:
-    from app.document_engine.blueprint.builders.section import section_bp_from_normalized
-
 
 
 @dataclass(slots=True)
@@ -46,6 +42,7 @@ class TemplateDraftConfig:
             name=self.name,
             description=self.description,
         )
+
 
 @dataclass(slots=True)
 class TemplateBuilderContext:
@@ -88,10 +85,14 @@ class TemplateBuilder:
         self,
         normalized: tuple[NormalizedSection, ...],
         default_config: TemplateConfig,
-        placeholder_defaults: dict[str, dict[str, Any]],      # request from placeholders registry table
-        languages: set[str],        # request from languages reference table
+        placeholder_defaults: dict[str, dict[str, Any]],
+        languages: set[str],
         diagnostics: DiagnosticCollector,
     ) -> TemplateDraft:
+
+        # Imported here (not at module level) to break the
+        # template_builder -> section -> paragraph -> template_builder cycle.
+        from app.document_engine.blueprint.builders.section import section_bp_from_normalized
 
         config = TemplateDraftConfig.from_template_config(default_config)
 

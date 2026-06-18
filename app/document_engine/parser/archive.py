@@ -8,7 +8,7 @@ from lxml import etree # type: ignore
 from app.document_engine.parser.errors import ParserFormatError
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(frozen=True)
 class DocxPaths:
     document: str = "word/document.xml"
     styles: str = "word/styles.xml"
