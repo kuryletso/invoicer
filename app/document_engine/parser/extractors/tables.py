@@ -19,11 +19,11 @@ def parse_table(table: _Element, context: ParserContext) -> TableNode:
             cell_style = context.style_resolver.resolve_cell_style(cell, table_style, row_style)
 
             for child in cell:
-                if child.tag == "w:p":
+                if child.tag == f"{{{NS['w']}}}p":
                     blocks.append(
                         parse_paragraph(child, context)
                     )
-                if child.tag == "w:tbl":
+                elif child.tag == f"{{{NS['w']}}}tbl":
                     blocks.append(
                         parse_table(child, context)
                     )
