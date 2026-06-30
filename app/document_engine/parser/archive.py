@@ -3,7 +3,7 @@ from zipfile import ZipFile
 from pathlib import Path
 from os import PathLike
 
-from lxml import etree # type: ignore
+from lxml import etree
 
 from app.document_engine.parser.errors import ParserFormatError
 

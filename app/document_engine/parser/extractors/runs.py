@@ -7,7 +7,7 @@ from app.document_engine.parser.namespaces import NS
 from app.document_engine.parser.errors import ParserSecurityError, ParserAssetError, ParserFormatError, UnsupportedFeatureError
 
 from app.core.errors import Layer
-from app.document_engine.utils.intrinsic_emu import intristic_emu
+from app.document_engine.utils.intrinsic_emu import intrinsic_emu
 
 type ParsedInlineNode = RunNode | ImageNode
 
@@ -105,8 +105,8 @@ def parse_image(run: _Element, context: ParserContext) -> ImageNode | None:
 
     width_emu, height_emu = extract_extent(run, context, target)
 
-    if width_emu == 0 and height_emu == 0:
-        fallback = intristic_emu(image_bytes)
+    if width_emu == 0 or height_emu == 0:
+        fallback = intrinsic_emu(image_bytes)
         if fallback is None:
             context.diagnostics.warn(
                 Layer.PARSER,
