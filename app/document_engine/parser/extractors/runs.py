@@ -6,6 +6,9 @@ from app.document_engine.parser.models.inlines import RunNode, ImageNode
 from app.document_engine.parser.namespaces import NS
 from app.document_engine.parser.errors import ParserSecurityError, ParserAssetError, ParserFormatError, UnsupportedFeatureError
 
+from app.core.errors import Layer
+from app.document_engine.utils.intrinsic_emu import intristic_emu
+
 type ParsedInlineNode = RunNode | ImageNode
 
 MAX_IMAGE_SIZE_BYTES = 25 * 1024 * 1024
@@ -37,6 +40,32 @@ def extract_run_text(run: _Element) -> str:
                 parts.append("\n")
 
     return "".join(parts)
+
+
+def extract_extent(
+    run: _Element,
+    context: ParserContext,
+    target: str,
+) -> tuple[int, int]:
+    
+    extent = run.find(".//wp:extent", NS)
+
+    if extent is not None:
+        cx = extent.get("cx")
+        cy = extent.get("cy")
+        if cx is not None and cy is not None:
+            try:
+                return int(cx), int(cy)
+            except ValueError:
+                pass
+
+    context.diagnostics.warn(
+        Layer.PARSER,
+        "image_missing_extent",
+        "Image has no usable wp:extent; size set to 0.",
+        target=target,
+    )
+    return 0,0
 
 
 def parse_image(run: _Element, context: ParserContext) -> ImageNode | None:
@@ -74,12 +103,30 @@ def parse_image(run: _Element, context: ParserContext) -> ImageNode | None:
             f"Invalid image reference {target}."
         ) from e
 
+    width_emu, height_emu = extract_extent(run, context, target)
+
+    if width_emu == 0 and height_emu == 0:
+        fallback = intristic_emu(image_bytes)
+        if fallback is None:
+            context.diagnostics.warn(
+                Layer.PARSER,
+                "image_unsizable",
+                "Image has no extent and unreadable dimensions; skipped.",
+                target=target,
+            )
+            return None
+        width_emu, height_emu = fallback
+
     asset = context.asset_service.create_image_asset(
         filename=PurePosixPath(target).name,
         data=image_bytes,
     )
 
-    return ImageNode(asset_id=asset.id)
+    return ImageNode(
+        asset_id=asset.id,
+        width_emu=width_emu,
+        height_emu=height_emu,
+    )
 
 
 def parse_inline(run: _Element, context: ParserContext) -> list[ParsedInlineNode]:

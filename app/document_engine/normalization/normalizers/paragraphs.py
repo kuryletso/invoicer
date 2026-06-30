@@ -98,7 +98,11 @@ def normalize_paragraph(paragraph: ParagraphNode) -> NormalizedParagraph:
         elif isinstance(node, ImageNode):
             flush_text()
             normalized_inlines.append(
-                NormalizedImageNode(asset_id=node.asset_id)
+                NormalizedImageNode(
+                    asset_id=node.asset_id,
+                    width_emu=node.width_emu,
+                    height_emu=node.height_emu,
+                )
             )
 
         else:

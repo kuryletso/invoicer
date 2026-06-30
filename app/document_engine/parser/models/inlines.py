@@ -12,3 +12,5 @@ class RunNode:
 @dataclass(slots=True, frozen=True)
 class ImageNode:
     asset_id: str
+    width_emu: int
+    height_emu: int

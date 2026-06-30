@@ -20,6 +20,8 @@ class NormalizedTextNode:
 @dataclass(slots=True, frozen=True)
 class NormalizedImageNode:
     asset_id: str
+    width_emu: int
+    height_emu: int
 
 
 type NormalizedInlineNode = NormalizedTextNode | NormalizedImageNode

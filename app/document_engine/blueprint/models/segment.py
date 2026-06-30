@@ -42,3 +42,5 @@ class GroupedPlaceholderSegment(BlueprintBase):
 class ImageSegment(BlueprintBase):
     type: Literal["image"] = "image"
     asset_id: str
+    width_emu: int
+    height_emu: int

@@ -36,6 +36,8 @@ def image_segment_bp_from_normalized(
     return ImageSegment(
         type="image",
         asset_id=image.asset_id,
+        width_emu=image.width_emu,
+        height_emu=image.height_emu,
     )
 
 
