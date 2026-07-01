@@ -1,0 +1,18 @@
+from lxml import etree
+from app.document_engine.rendering.docx.xml import qn, WORD_NSMAP
+
+def build_document(
+    blocks: list[etree._Element],
+    sect_pr: etree._Element | None = None,
+) -> etree._Element:
+    
+    root = etree.Element(qn("w:document"), nsmap=WORD_NSMAP)
+    body = etree.SubElement(root, qn("w:body"))
+
+    for block in blocks:
+        body.append(block)
+
+    if sect_pr is not None:
+        body.append(sect_pr)
+
+    return root
