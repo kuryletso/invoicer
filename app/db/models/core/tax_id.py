@@ -19,14 +19,14 @@ class TaxId(Base):
     __table_args__ = (
         UniqueConstraint(
             "organization_id",
-            "tax_id_system_code",
             "country_code",
+            "tax_id_system_code",
             name="unique_organization_tax_id_system"
         ),
         Index(
             "idx_country_system_value",
             "country_code",
-            "tax_id_system",
+            "tax_id_system_code",
             "value"
         )
     )

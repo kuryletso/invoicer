@@ -44,7 +44,7 @@ class BankAccount(Base):
         unique=True
     )
 
-    swift: Mapped[str] = mapped_column(
+    swift: Mapped[str | None] = mapped_column(
         String(11),
     )
 

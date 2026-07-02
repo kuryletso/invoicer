@@ -6,7 +6,7 @@ from app.db.base import Base
 class Template(Base):
     __tablename__ = "templates"
 
-    id: Mapped[int] = mapped_column()
+    id: Mapped[int] = mapped_column(primary_key=True)
 
     sections: Mapped[list[str]] = mapped_column(
         JSON,

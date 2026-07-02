@@ -34,10 +34,10 @@ class BankAccountLocalization(Base):
         foreign_keys=[language_code],
     )
 
-    bank_name: Mapped[str] = mapped_column(
+    bank_name: Mapped[str | None] = mapped_column(
         String(255),
     )
 
-    bank_info: Mapped[str] = mapped_column(
+    bank_info: Mapped[str | None] = mapped_column(
         String(255),
     )

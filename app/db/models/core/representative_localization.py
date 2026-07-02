@@ -38,6 +38,6 @@ class RepresentativeLocalization(Base):
         String(255),
     )
 
-    title: Mapped[str] = mapped_column(
+    title: Mapped[str | None] = mapped_column(
         String(150),
     )
