@@ -11,6 +11,7 @@ from app.document_engine.normalization.models.inlines import (
     NormalizedTextNode,
     NormalizedTextStyle,
 )
+from app.document_engine.enums.enums import PlaceholderType
 
 
 class FixtureInputProvider:
@@ -26,13 +27,13 @@ class FixtureInputProvider:
         placeholders: dict[str, dict[str, Any]] | None = None,
         config: TemplateConfig | None = None,
     ) -> None:
-        self._languages = languages or {"en", "uk"}
+        self._languages = languages or {"ENG", "UKR"}
         self._placeholders = placeholders or {
-            "org_name": {"active": True, "required": True},
-            "invoice_no": {"active": True, "required": True},
+            "org_name": {"active": True, "required": True, "type": PlaceholderType.SCALAR},
+            "invoice_no": {"active": True, "required": True, "type": PlaceholderType.SCALAR},
         }
         self._config = config or TemplateConfig(
-            primary_language="en",
+            primary_language="ENG",
             secondary_language=None,
             type="invoice",
             name="seed",
@@ -113,7 +114,7 @@ def make_context() -> Callable[..., TemplateBuilderContext]:
 
     def _make(
         *,
-        default_language: str = "en",
+        default_language: str = "ENG",
         languages: set[str] | None = None,
         placeholders: dict[str, dict[str, Any]] | None = None,
         diagnostics: DiagnosticCollector | None = None,
@@ -122,10 +123,10 @@ def make_context() -> Callable[..., TemplateBuilderContext]:
             default_language=default_language,
             placeholder_defaults=placeholders
             or {
-                "org_name": {"active": True, "required": True},
-                "invoice_no": {"active": True, "required": True},
+                "org_name": {"active": True, "required": True, "type": PlaceholderType.SCALAR},
+                "invoice_no": {"active": True, "required": True, "type": PlaceholderType.SCALAR},
             },
-            languages=languages or {"en", "uk"},
+            languages=languages or {"ENG", "UKR"},
             placeholders={},
             diagnostics=diagnostics or DiagnosticCollector(),
         )

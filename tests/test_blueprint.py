@@ -56,14 +56,14 @@ def test_tokenize_unexpected_char_raises():
     "key,expected",
     [
         ("org_name", ("org_name", None)),
-        ("org_name.en", ("org_name", "en")),
+        ("org_name.ENG", ("org_name", "ENG")),
     ],
 )
 def test_split_placeholder_key_valid(key, expected):
     assert split_placeholder_key(key) == expected
 
 
-@pytest.mark.parametrize("key", ["a.b.c", ".en", "org."])
+@pytest.mark.parametrize("key", ["a.b.c", ".ENG", "org."])
 def test_split_placeholder_key_invalid(key):
     with pytest.raises(PlaceholderSyntaxError):
         split_placeholder_key(key)
@@ -80,7 +80,7 @@ def test_extract_simple_placeholder_registers_key(make_text_node, make_context):
     assert segments[0].text == "Hello "
     assert isinstance(segments[1], PlaceholderSegment)
     assert segments[1].key == "org_name"
-    assert segments[1].language == "en"               # default language
+    assert segments[1].language == "ENG"              # default language
     assert "org_name" in ctx.placeholders
     assert ctx.diagnostics.warnings == []
 

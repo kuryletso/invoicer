@@ -67,4 +67,4 @@ def test_ingest_wraps_stage_failure_in_ingestion_error(tmp_path, fixture_provide
 def test_fixture_provider_satisfies_input_protocol(fixture_provider):
     assert isinstance(fixture_provider.languages(), set)
     assert isinstance(fixture_provider.placeholder_defaults(), dict)
-    assert fixture_provider.default_template_config().primary_language == "en"
+    assert fixture_provider.default_template_config().primary_language == "ENG"
