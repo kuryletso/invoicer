@@ -2,6 +2,8 @@ from typing import Literal
 
 from app.document_engine.blueprint.models.blueprint_base import BlueprintBase
 
+from app.document_engine.enums.enums import PlaceholderType
+
 
 class TextStyleBlueprint(BlueprintBase):
     bold: bool
@@ -22,6 +24,7 @@ class PlaceholderSegment(BlueprintBase):
     type: Literal["placeholder"] = "placeholder"
     key: str
     language: str
+    ph_type: PlaceholderType
     style: TextStyleBlueprint
 
 

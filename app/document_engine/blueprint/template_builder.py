@@ -10,6 +10,7 @@ from app.document_engine.blueprint.models.section import SectionBlueprint
 from app.document_engine.blueprint.errors import PlaceholderSyntaxError
 
 from app.document_engine.normalization.models.sections import NormalizedSection
+from app.document_engine.enums.enums import PlaceholderType
 
 
 @dataclass(slots=True)
@@ -56,20 +57,21 @@ class TemplateBuilderContext:
     def register_placeholder(
         self,
         key: str,
-    ) -> None:
+    ) -> PlaceholderType:
         
         if key in self.placeholder_defaults:
-            if not self.placeholder_defaults[key].get("active", False):
+            default = self.placeholder_defaults[key]
+            if not default.get("active", False):
                 raise PlaceholderSyntaxError(
                     f"Placeholder key '{key}' is disabled."
                 )
 
-            self.placeholders.setdefault(key, self.placeholder_defaults[key])
+            self.placeholders.setdefault(key, default)
+            return PlaceholderType(default["type"])
 
-        else:
-            raise PlaceholderSyntaxError(
-                f"Not registered key in placeholder: {key}."
-            )
+        raise PlaceholderSyntaxError(
+            f"Not registered key in placeholder: {key}."
+        )
         
 
 @dataclass(slots=True)

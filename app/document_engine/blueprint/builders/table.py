@@ -31,6 +31,7 @@ from app.document_engine.normalization.models.blocks import (
     NormalizedTableBorder,
     NormalizedParagraph,
 )
+from app.document_engine.enums.enums import PlaceholderType
 
 
 def table_border_bp_from_normalized(
@@ -180,11 +181,11 @@ def _promote_placeholder_rows(
                     if isinstance(block, ParagraphBlueprint):
                         for seg in block.segments:
                             if isinstance(seg, PlaceholderSegment):
-                                if seg.key == "invoice_table":
+                                if seg.ph_type == PlaceholderType.TABLE:
                                     replace_table = True
                                     break
 
-                                elif seg.key.startswith("invl_"):
+                                elif seg.ph_type == PlaceholderType.COLUMN:
                                     
                                     if i in placeholder_cells:
                                         raise PlaceholderSyntaxError(

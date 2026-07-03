@@ -111,13 +111,14 @@ def _parse_grouped(
                     raise PlaceholderSyntaxError(
                         f"Invalid placeholder key '{t.value}': invalid language."
                     )
-                context.register_placeholder(base)
+                ph_type = context.register_placeholder(base)
                 
                 curr_group.append(
                     PlaceholderSegment(
                         type="placeholder",
                         key=base,
                         language=language,
+                        ph_type=ph_type,
                         style=style,
                     )
                 )
@@ -207,12 +208,13 @@ def _parse_joined(
                     raise PlaceholderSyntaxError(
                         f"Invalid placeholder key '{t.value}': invalid language."
                     )
-                context.register_placeholder(base)
+                ph_type = context.register_placeholder(base)
                 items.append(
                     PlaceholderSegment(
                         type="placeholder",
                         key=base,
                         language=language,
+                        ph_type=ph_type,
                         style=style,
                     )
                 )
@@ -258,12 +260,13 @@ def _parse_simple(
             raise PlaceholderSyntaxError(
                 f"Invalid placeholder key '{t.value}': invalid language."
             )
-        context.register_placeholder(base)
+        ph_type = context.register_placeholder(base)
 
         return PlaceholderSegment(
             type="placeholder",
             key=base,
             language=language,
+            ph_type=ph_type,
             style=style,
         )
 
