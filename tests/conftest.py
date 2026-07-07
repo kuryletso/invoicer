@@ -38,6 +38,7 @@ class FixtureInputProvider:
             type="invoice",
             name="seed",
             description="",
+            append_currency=False,
         )
 
     def default_template_config(self) -> TemplateConfig:
