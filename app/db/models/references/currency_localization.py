@@ -37,3 +37,7 @@ class CurrencyLocalization(Base):
     name: Mapped[str] = mapped_column(
         String(90),
     )
+
+    symbol: Mapped[str | None] = mapped_column(
+        String(8),
+    )

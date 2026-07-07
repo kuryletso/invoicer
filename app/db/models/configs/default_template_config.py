@@ -42,3 +42,7 @@ class DefaultTemplateConfig(Base):
     description: Mapped[str] = mapped_column(
         String(255),
     )
+
+    append_currency: Mapped[bool] = mapped_column(
+        default=False,
+    )
