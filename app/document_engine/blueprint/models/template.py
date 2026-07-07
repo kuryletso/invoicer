@@ -12,6 +12,7 @@ class TemplateConfig(BlueprintBase):
     type: str
     name: str
     description: str
+    append_currency: bool
 
 
 class TemplateBlueprint(BlueprintBase):

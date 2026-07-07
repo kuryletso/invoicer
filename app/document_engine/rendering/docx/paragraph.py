@@ -19,9 +19,6 @@ def build_paragraph(
     ppr = etree.SubElement(p, qn(P.properties))
 
     if style.keep_next:
-        etree.SubElement(p, qn(P.properties))
-
-    if style.keep_next:
         etree.SubElement(ppr, qn(P.keep_next))
 
     spacing = etree.SubElement(ppr, qn(P.spacing))      # twips

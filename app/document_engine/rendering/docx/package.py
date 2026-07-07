@@ -11,12 +11,20 @@ from app.document_engine.rendering.docx.constants import (
 
 from app.document_engine.rendering.errors import PackageError
 
+
+def _rels_path(owner: str) -> str:
+    # "word/document.xml" -> "word/_rels/document.xml.rels"
+    directory, _, name = owner.rpartition("/")
+    prefix = f"{directory}/" if directory else ""
+    return f"{prefix}_rels/{name}.rels"
+
+
 class DocxPackage:
     def __init__(self) -> None:
         self._parts: dict[str, bytes] = {}
         self._overrides: dict[str, str] = {}
         self._extensions: dict[str, str] = {}
-        self._doc_rels = RelationshipRegistry()
+        self._rels: dict[str, RelationshipRegistry] = {}
 
     def add_xml(
         self,
@@ -61,13 +69,24 @@ class DocxPackage:
             standalone=True,
         )
 
+
+    def add_relationship(
+        self,
+        owner: str,
+        rtype: str,
+        target: str,
+    ) -> str:
+        
+        return self._rels.setdefault(owner, RelationshipRegistry()).add(rtype, target)
+
+
     def add_document_relationship(
         self,
         rtype: str,
         target: str,
     ) -> str:
         
-        return self._doc_rels.add(rtype, target)
+        return self.add_relationship("word/document.xml", rtype, target)
 
 
     def to_bytes(self) -> bytes:
@@ -87,18 +106,18 @@ class DocxPackage:
             )
             zf.writestr("_rels/.rels", ROOT_RELS)
 
-            doc_rels = self._doc_rels.build()
-            if doc_rels is not None:
-                zf.writestr(
-                    "word/_rels/document.xml.rels",
-                    etree.tostring(
-                        doc_rels,
-                        xml_declaration=True,
-                        encoding="UTF-8",
-                        standalone=True,
+            for owner, registry in self._rels.items():
+                rels_el = registry.build()
+                if rels_el is not None:
+                    zf.writestr(
+                        _rels_path(owner),
+                        etree.tostring(
+                            rels_el,
+                            xml_declaration=True,
+                            encoding="UTF-8",
+                            standalone=True,
+                        )
                     )
-                )
-
 
             for path, data in self._parts.items():
                 zf.writestr(path, data)

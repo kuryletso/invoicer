@@ -72,3 +72,8 @@ class PlaceholderType(StrEnum):
     SCALAR = "scalar"
     TABLE = "table"
     COLUMN = "column"
+
+
+class MoneySymbolPosition(StrEnum):
+    PREFIX = "prefix"
+    SUFFIX = "suffix"

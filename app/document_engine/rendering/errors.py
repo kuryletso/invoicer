@@ -8,3 +8,7 @@ class RenderingError(AppError):
 
 class PackageError(RenderingError):
     category = ErrorCategory.INTERNAL
+
+
+class PlaceholderError(RenderingError):
+    category = ErrorCategory.VALIDATION

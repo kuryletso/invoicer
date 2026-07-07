@@ -20,6 +20,7 @@ class TemplateDraftConfig:
     name: str
     secondary_language: str | None = None
     description: str = ""
+    append_currency: bool = True
 
     @classmethod
     def from_template_config(
@@ -33,6 +34,7 @@ class TemplateDraftConfig:
             type=config.type,
             name=config.name,
             description=config.description,
+            append_currency=config.append_currency,
         )
 
     def to_template_config(self) -> TemplateConfig:
@@ -42,6 +44,7 @@ class TemplateDraftConfig:
             type=self.type,
             name=self.name,
             description=self.description,
+            append_currency=self.append_currency,
         )
 
 

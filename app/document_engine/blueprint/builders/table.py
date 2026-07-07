@@ -154,6 +154,7 @@ def _promote_placeholder_rows(
      
     new_rows = []
     replace_table = False
+    table_language, table_text_style = None, None
 
     for row in table.rows:
 
@@ -183,6 +184,8 @@ def _promote_placeholder_rows(
                             if isinstance(seg, PlaceholderSegment):
                                 if seg.ph_type == PlaceholderType.TABLE:
                                     replace_table = True
+                                    table_language = seg.language
+                                    table_text_style = seg.style
                                     break
 
                                 elif seg.ph_type == PlaceholderType.COLUMN:
@@ -197,6 +200,7 @@ def _promote_placeholder_rows(
                                         language=seg.language,
                                         cell_style=cell.style,
                                         text_style=seg.style,
+                                        para_style=block.style,
                                     )
 
         if placeholder_cells:
@@ -217,6 +221,8 @@ def _promote_placeholder_rows(
     if replace_table:
         return TablePlaceholder(
             type="placeholder_table",
+            language=table_language,        # all good here
+            text_style=table_text_style,    # table_language and table_text_stlye won't be None if replace_table is True
             style=table.style,
         )
     
