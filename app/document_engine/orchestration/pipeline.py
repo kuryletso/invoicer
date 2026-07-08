@@ -8,9 +8,15 @@ from app.document_engine.normalization.structural_normalizer import StructuralNo
 from app.document_engine.blueprint.template_builder import TemplateBuilder, TemplateDraft
 from app.document_engine.blueprint.models.template import TemplateBlueprint
 
+from app.document_engine.rendering.context import RenderContext
+from app.document_engine.rendering.ports import AssetProvider
+from app.document_engine.rendering.validate import validate_context
+from app.document_engine.rendering.resolve.resolver import DocumentResolver
+from app.document_engine.rendering.docx.emitter import DocxEmitter
+
 from .ports import TemplateInputProvider
-from .results import IngestionResult
-from .errors import IngestionError
+from .results import IngestionResult, RenderingResult
+from .errors import IngestionError, RenderingFailedError
 
 
 class TemplateIngestionPipeline:
@@ -58,3 +64,37 @@ class TemplateIngestionPipeline:
     ) -> TemplateBlueprint:
         
         return TemplateBuilder().save_draft(draft)
+    
+
+
+class TemplateRenderingPipeline:
+    def __init__(self, assets: AssetProvider) -> None:
+        self._assets = assets
+
+    def render(
+        self,
+        blueprint: TemplateBlueprint,
+        context: RenderContext,
+    ) -> RenderingResult:
+        
+        diagnostics = DiagnosticCollector()
+
+        if not validate_context(blueprint, context, diagnostics):
+            return RenderingResult(docx=None, diagnostics=diagnostics)
+        
+        try:
+            resolved = DocumentResolver(
+                context,
+                self._assets,
+                diagnostics,
+            ).resolve(blueprint)
+            docx = DocxEmitter(diagnostics).emit(resolved)
+        except AppError as e:
+            diagnostics.record(e.as_diagnostic(Severity.ERROR))
+            raise RenderingFailedError(
+                f"Rendering failed in {e.layer}: {e}:",
+                user_message="The document could not be rendered.",
+                context={"cause": e.code},
+            ) from e
+        
+        return RenderingResult(docx=docx, diagnostics=diagnostics)

@@ -8,3 +8,9 @@ from app.document_engine.blueprint.template_builder import TemplateDraft
 class IngestionResult:
     draft: TemplateDraft
     diagnostics: DiagnosticCollector
+
+
+@dataclass(slots=True)
+class RenderingResult:
+    docx: bytes | None
+    diagnostics: DiagnosticCollector
