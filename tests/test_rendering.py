@@ -48,6 +48,9 @@ from app.document_engine.rendering.resolve.models import (
     ResolvedTextRun, ResolvedImageRun,
 )
 from app.document_engine.rendering.docx.emitter import DocxEmitter
+from app.core.errors import Layer
+from app.document_engine.orchestration.pipeline import TemplateRenderingPipeline
+from app.document_engine.orchestration.errors import RenderingFailedError
 
 
 # --------------------------------------------------------------------------
@@ -396,3 +399,45 @@ def test_ingest_resolve_emit_round_trip(make_docx, fixture_provider):
     body_text = "\n".join(p.text for p in doc.paragraphs)
     assert "Acme LLC" in body_text and "INV-001" in body_text
     assert "{{" not in body_text
+
+
+# ==========================================================================
+# orchestration: TemplateRenderingPipeline (validate -> resolve -> emit)
+# ==========================================================================
+
+def test_render_pipeline_success():
+    bp = blueprint([section([paragraph(text_seg("Invoice for "), ph_seg("org_name"))])],
+                   required("org_name"))
+    ctx = RenderContext(scalars={"org_name": {"ENG": "Acme LLC"}})
+
+    result = TemplateRenderingPipeline(DictAssets({})).render(bp, ctx)
+
+    assert result.docx is not None
+    assert not result.diagnostics.has_errors
+    assert "Acme LLC" in "\n".join(p.text for p in open_docx(result.docx).paragraphs)
+
+
+def test_render_pipeline_gates_on_missing_required():
+    bp = blueprint([section([paragraph(ph_seg("org_name"))])], required("org_name"))
+
+    result = TemplateRenderingPipeline(DictAssets({})).render(bp, RenderContext(scalars={}))
+
+    assert result.docx is None                              # gated, not raised
+    assert result.diagnostics.has_errors
+
+
+def test_render_pipeline_wraps_internal_error(monkeypatch):
+    from app.document_engine.orchestration import pipeline as pipeline_mod
+    from app.document_engine.rendering.errors import RenderingError as RenderLayerError
+
+    def boom(self, document):
+        raise RenderLayerError("kaboom")                    # a RENDER-layer AppError
+
+    monkeypatch.setattr(pipeline_mod.DocxEmitter, "emit", boom)
+
+    bp = blueprint([section([paragraph(text_seg("hi"))])])
+    with pytest.raises(RenderingFailedError) as exc:
+        TemplateRenderingPipeline(DictAssets({})).render(bp, RenderContext())
+
+    assert exc.value.layer is Layer.ORCHESTRATION
+    assert isinstance(exc.value.__cause__, RenderLayerError)
