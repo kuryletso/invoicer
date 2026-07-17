@@ -12,6 +12,7 @@ from app.db.models.registries import (
     measurement_unit,
     measurement_unit_localization,
     placeholder,
+    placeholder_localization,
     tax_id_system,
     tax_id_system_localization,
 )

@@ -9,14 +9,14 @@ from app.db.base import Base
 from app.db.models.references.language import Language
 
 if TYPE_CHECKING:
-    from app.db.models.core.organization import Organization
+    from app.db.models.registries.placeholder import PlaceholderRegistry
 
 
-class OrganizationLocalization(Base):
-    __tablename__ = "organization_localizations"
+class PlaceholderRegistryLocalization(Base):
+    __tablename__ = "placeholder_registry_localizations"
 
-    organization_id: Mapped[int] = mapped_column(
-        ForeignKey("organizations.id"),
+    placeholder_key: Mapped[str] = mapped_column(
+        ForeignKey("placeholder_registry.key"),
         primary_key=True,
     )
 
@@ -25,8 +25,8 @@ class OrganizationLocalization(Base):
         primary_key=True,
     )
 
-    organization: Mapped[Organization] = relationship(
-        foreign_keys=[organization_id],
+    placeholder: Mapped[PlaceholderRegistry] = relationship(
+        foreign_keys=[placeholder_key],
         back_populates="localizations",
     )
 
@@ -34,14 +34,10 @@ class OrganizationLocalization(Base):
         foreign_keys=[language_code],
     )
 
-    org_type: Mapped[str] = mapped_column(
-        String(255),
+    label: Mapped[str | None] = mapped_column(
+        String(30),
     )
 
-    legal_name: Mapped[str] = mapped_column(
-        String(255),
-    )
-
-    address: Mapped[str | None] = mapped_column(
-        String(255),
+    description: Mapped[str | None] = mapped_column(
+        String(120),
     )
