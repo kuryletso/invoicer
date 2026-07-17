@@ -48,3 +48,5 @@ class DocumentSequence(Base):
     )
 
     counter: Mapped[int]
+
+    padding: Mapped[int]

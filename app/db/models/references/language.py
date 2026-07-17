@@ -13,6 +13,10 @@ class Language(Base):
         primary_key=True,
     )
 
+    code_alpha_2: Mapped[str] = mapped_column(
+        String(2),
+    )
+
     label_en: Mapped[str] = mapped_column(
         String(25),
     )
