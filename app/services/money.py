@@ -44,7 +44,6 @@ class MoneyFormat:
     symbol_position: MoneySymbolPosition
     symbol_spacing: bool
     symbols: Mapping[str, str]
-    append_currency: bool
 
 
     def format(

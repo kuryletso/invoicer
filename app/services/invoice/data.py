@@ -53,7 +53,7 @@ class Line:
 @dataclass(slots=True, frozen=True)
 class InvoiceData:
     prefix: str
-    number: int
+    number: str
     issue_date: date
     currency: MoneyFormat
     provider: Party
