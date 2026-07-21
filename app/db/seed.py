@@ -51,8 +51,8 @@ def seed(
 
 def _language_row(raw: dict) -> dict:
     return {
-        "code": raw["ISO 649-3"].upper(),
-        "code_alpha_2": raw["ISO 649-1"],
+        "code": raw["ISO 639-3"].upper(),
+        "code_alpha_2": raw["ISO 639-1"],
         "label_en": raw["ISO language name"],
         "label_uk": raw["Ukrainian"],
     }
