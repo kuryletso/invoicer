@@ -1,6 +1,7 @@
 """End-to-end tests for the template ingestion pipeline."""
 
 import zipfile
+from collections.abc import Mapping
 
 import pytest
 
@@ -8,8 +9,10 @@ from app.core.errors import Layer
 from app.document_engine.orchestration.pipeline import TemplateIngestionPipeline
 from app.document_engine.orchestration.results import IngestionResult
 from app.document_engine.orchestration.errors import IngestionError
-from app.document_engine.blueprint.models.template import TemplateBlueprint
+from app.document_engine.blueprint.models.template import TemplateBlueprint, TemplateConfig
 from app.document_engine.parser.errors import ParserError
+
+from tests.conftest import FixtureInputProvider
 
 
 def test_ingest_returns_draft_and_registers_placeholders(make_docx, fixture_provider):
@@ -68,3 +71,62 @@ def test_fixture_provider_satisfies_input_protocol(fixture_provider):
     assert isinstance(fixture_provider.languages(), set)
     assert isinstance(fixture_provider.placeholder_defaults(), dict)
     assert fixture_provider.default_template_config().primary_language == "ENG"
+
+
+def test_provider_derives_languages_from_its_config(fixture_provider):
+    """languages() is the template's renderable set, not every known language."""
+    config = fixture_provider.default_template_config()
+
+    assert fixture_provider.languages() == {"ENG", "UKR"}
+    assert fixture_provider.languages() == {config.primary_language, config.secondary_language}
+
+
+def test_provider_drops_absent_secondary_language():
+    provider = FixtureInputProvider(config=TemplateConfig(
+        primary_language="ENG",
+        secondary_language=None,
+        type="invoice",
+        name="seed",
+        description="",
+        append_currency=False,
+    ))
+
+    assert provider.languages() == {"ENG"}
+
+
+def test_provider_honours_an_explicit_language_override():
+    provider = FixtureInputProvider(languages={"ENG", "UKR", "DEU"})
+
+    assert provider.languages() == {"ENG", "UKR", "DEU"}
+
+
+def test_language_suffix_outside_the_provider_set_is_rejected(make_docx, fixture_provider):
+    """A `.DEU` suffix can never be filled, so ingestion must warn rather than accept it."""
+    path = make_docx(paragraphs=["Hello {{ org_name.DEU }}"])
+    pipeline = TemplateIngestionPipeline(fixture_provider)
+
+    result = pipeline.ingest(path)
+
+    assert len(result.diagnostics.warnings) == 1
+    assert result.diagnostics.warnings[0].layer is Layer.BLUEPRINT
+
+
+def test_language_suffix_inside_the_provider_set_is_accepted(make_docx, fixture_provider):
+    path = make_docx(paragraphs=["Hello {{ org_name.UKR }}"])
+    pipeline = TemplateIngestionPipeline(fixture_provider)
+
+    result = pipeline.ingest(path)
+
+    assert result.diagnostics.warnings == []
+    assert "org_name" in result.draft.context.placeholders
+
+
+def test_ingest_returns_an_asset_bundle(make_docx, fixture_provider):
+    """Image-free templates still carry a (empty) bundle for the repository to persist."""
+    path = make_docx(paragraphs=["Invoice for {{ org_name }}"])
+    pipeline = TemplateIngestionPipeline(fixture_provider)
+
+    result = pipeline.ingest(path)
+
+    assert isinstance(result.assets, Mapping)
+    assert result.assets == {}

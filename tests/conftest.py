@@ -68,14 +68,14 @@ class FixtureInputProvider:
         placeholders: dict[str, dict[str, Any]] | None = None,
         config: TemplateConfig | None = None,
     ) -> None:
-        self._languages = languages or {"ENG", "UKR"}
+        self._languages = languages
         self._placeholders = placeholders or {
             "org_name": {"active": True, "required": True, "type": PlaceholderType.SCALAR},
             "invoice_no": {"active": True, "required": True, "type": PlaceholderType.SCALAR},
         }
         self._config = config or TemplateConfig(
             primary_language="ENG",
-            secondary_language=None,
+            secondary_language="UKR",
             type="invoice",
             name="seed",
             description="",
@@ -89,7 +89,14 @@ class FixtureInputProvider:
         return self._placeholders
 
     def languages(self) -> set[str]:
-        return self._languages
+        """Mirrors DbTemplateInputProvider: the template's renderable languages."""
+        if self._languages is not None:
+            return self._languages
+        return {
+            code
+            for code in (self._config.primary_language, self._config.secondary_language)
+            if code
+        }
 
 
 @pytest.fixture
