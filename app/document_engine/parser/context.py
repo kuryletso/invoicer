@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from app.assets.service import AssetService
+from app.assets.service import AssetCollector
 from app.core.diagnostics import DiagnosticCollector
 from app.document_engine.parser.archive import DocxArchive
 from app.document_engine.parser.relationships import RelationshipResolver
@@ -11,6 +11,6 @@ from app.document_engine.parser.style_resolver.style_resolver import StyleResolv
 class ParserContext:
     archive: DocxArchive
     relationships: RelationshipResolver
-    asset_service: AssetService
+    assets: AssetCollector
     style_resolver: StyleResolver
     diagnostics: DiagnosticCollector

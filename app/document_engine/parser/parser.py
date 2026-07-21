@@ -1,6 +1,7 @@
+from collections.abc import Mapping
 from pathlib import Path
 
-from app.assets.service import AssetService
+from app.assets.service import AssetCollector, AssetBlob
 from app.core.diagnostics import DiagnosticCollector
 from app.document_engine.parser.archive import DocxArchive, DocxPaths
 from app.document_engine.parser.context import ParserContext
@@ -35,7 +36,7 @@ class DocxParser:
         self.context = ParserContext(
             archive=self.archive,
             relationships=self.relationships,
-            asset_service=AssetService(),
+            assets=AssetCollector(),
             style_resolver=StyleResolver(self.styles, self.doc_defaults),
             diagnostics=diagnostics,
         )
@@ -64,3 +65,7 @@ class DocxParser:
                     result.append(parse_section(node, self.context))
 
         return result
+    
+    @property
+    def assets(self) -> Mapping[str, AssetBlob]:
+        return self.context.assets.bundle

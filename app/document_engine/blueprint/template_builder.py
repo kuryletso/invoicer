@@ -12,6 +12,8 @@ from app.document_engine.blueprint.errors import PlaceholderSyntaxError
 from app.document_engine.normalization.models.sections import NormalizedSection
 from app.document_engine.enums.enums import PlaceholderType
 
+from app.services.template.repository import TemplateRepository
+
 
 @dataclass(slots=True)
 class TemplateDraftConfig:

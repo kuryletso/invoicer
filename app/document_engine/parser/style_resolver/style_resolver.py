@@ -24,7 +24,7 @@ class StyleResolver:
     def __init__(
             self,
             styles: dict[str, StyleNode],
-            doc_defaults: _Element,
+            doc_defaults: _Element | None,
         ) -> None:
 
         self.styles = styles

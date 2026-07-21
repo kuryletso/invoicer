@@ -117,13 +117,13 @@ def parse_image(run: _Element, context: ParserContext) -> ImageNode | None:
             return None
         width_emu, height_emu = fallback
 
-    asset = context.asset_service.create_image_asset(
+    asset_id = context.assets.add(
         filename=PurePosixPath(target).name,
         data=image_bytes,
     )
-
+    
     return ImageNode(
-        asset_id=asset.id,
+        asset_id=asset_id,
         width_emu=width_emu,
         height_emu=height_emu,
     )

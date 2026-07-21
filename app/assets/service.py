@@ -1,43 +1,42 @@
+from __future__ import annotations
+
+from collections.abc import Mapping
+from dataclasses import dataclass
+
 from app.assets.hashing import hash_bytes
-from app.assets.id import generate_asset_id
 from app.assets.mime import detect_mime_type
-from app.assets.models import ImageAsset
-from app.assets.storage import AssetStorage
 
 
-class AssetService:
+@dataclass(slots=True, frozen=True)
+class AssetBlob:
+    sha256: str
+    mime_type: str
+    data: bytes
+
+
+class AssetCollector:
+    """Accumulates image bytes during single parse, content-addressed by sha256."""
 
     def __init__(self) -> None:
+        self._assets: dict[str, AssetBlob] = {}
 
-        self.storage = AssetStorage()
+    def add(
+            self,
+            filename: str,
+            data: bytes,
+    ) -> str:
+        
+        digest = hash_bytes(data)
+        if digest not in self._assets:
+            self._assets[digest] = AssetBlob(
+                sha256=digest,
+                mime_type=detect_mime_type(filename),
+                data=data,
+            )
 
-        self.assets_by_hash: dict[str, ImageAsset] = {} # TODO: REPLACE WITH DB
+        return digest       # serves as an asset_id
+    
 
-    def create_image_asset(
-        self,
-        filename: str,
-        data: bytes,
-    ) -> ImageAsset:
-
-        sha256_hash = hash_bytes(data)
-
-        existing_asset = self.assets_by_hash.get(sha256_hash)
-        if existing_asset is not None:
-            return existing_asset
-
-        storage_path = self.storage.write(
-            sha256_hash=sha256_hash,
-            data=data,
-        )
-
-        asset = ImageAsset(
-            id=generate_asset_id(),
-            sha256=sha256_hash,
-            mime_type=detect_mime_type(filename),
-            storage_path=storage_path,
-            size_bytes=len(data),
-        )
-
-        self.assets_by_hash[sha256_hash] = asset # TODO: REPLACE WITH DB
-
-        return asset
+    @property
+    def bundle(self) -> Mapping[str, AssetBlob]:
+        return self._assets

@@ -37,6 +37,7 @@ class TemplateIngestionPipeline:
         try:
             with DocxParser(path, diagnostics=diagnostics) as parser:
                 parsed = parser.parse()
+                assets = dict(parser.assets)
 
             normalized = StructuralNormalizer.normalize(parsed, diagnostics)
 
@@ -56,7 +57,11 @@ class TemplateIngestionPipeline:
                 context={"path": str(path), "cause": e.code},
             ) from e
         
-        return IngestionResult(draft=draft, diagnostics=diagnostics)
+        return IngestionResult(
+            draft=draft,
+            assets=assets,
+            diagnostics=diagnostics,
+        )
     
     def finalize(
         self,
