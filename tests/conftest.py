@@ -110,12 +110,27 @@ def diagnostics() -> DiagnosticCollector:
 
 
 @pytest.fixture
+def make_png(tmp_path: Path) -> Callable[..., Path]:
+    """Factory writing a tiny real PNG, for exercising the image/asset path."""
+
+    def _make(name: str = "logo.png", color: tuple[int, int, int] = (220, 20, 60)) -> Path:
+        from PIL import Image
+
+        path = tmp_path / name
+        Image.new("RGB", (32, 16), color).save(path)
+        return path
+
+    return _make
+
+
+@pytest.fixture
 def make_docx(tmp_path: Path) -> Callable[..., Path]:
     """Factory building a real .docx via python-docx into the test's tmp dir."""
 
     def _make(
         paragraphs: list[str] | tuple[str, ...] = (),
         table: list[list[str]] | None = None,
+        image: Path | None = None,
         name: str = "test.docx",
     ) -> Path:
         document = Document()
@@ -128,6 +143,9 @@ def make_docx(tmp_path: Path) -> Callable[..., Path]:
             for r, row in enumerate(table):
                 for c, value in enumerate(row):
                     built.cell(r, c).text = value
+
+        if image is not None:
+            document.add_picture(str(image))
 
         path = tmp_path / name
         document.save(path)
@@ -207,6 +225,29 @@ def session() -> Session:
 
         s.commit()
         yield s
+
+
+@pytest.fixture
+def seeded_inputs(session: Session) -> None:
+    """Reference rows DbTemplateInputProvider reads: default config + placeholder vocabulary."""
+
+    session.add(DefaultTemplateConfig(
+        primary_language_code="ENG",
+        secondary_language_code="UKR",
+        document_type_code="invoice",
+        name="Default invoice",
+        description="seeded default",
+        append_currency=True,
+    ))
+    session.add_all([
+        PlaceholderRegistry(key="org_name", system=True, required=True,
+                            type=PlaceholderType.SCALAR, active=True, columns=None),
+        PlaceholderRegistry(key="invoice_no", system=True, required=False,
+                            type=PlaceholderType.SCALAR, active=True, columns=None),
+        PlaceholderRegistry(key="retired_key", system=True, required=False,
+                            type=PlaceholderType.SCALAR, active=False, columns=None),
+    ])
+    session.commit()
 
 
 @pytest.fixture
