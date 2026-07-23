@@ -12,7 +12,7 @@ DATABASE_URL = f"sqlite:///{database_path().as_posix()}"
 
 engine = create_engine(
     DATABASE_URL,
-    echo=True
+    # echo=True     # uncomment for debugging
 )
 
 SessionLocal = sessionmaker(bind=engine)
